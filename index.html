@@ -1792,6 +1792,7 @@ function voiceTick(dt) {
   VOICE.talkT -= dt;
   if (playing && VOICE.level > 0.08 && VOICE.talkT <= 0 && ME && !ME.dead) { VOICE.talkT = 1; if (isClient()) netSend({ t: 'talk' }); else if (G) makeNoise(ME.x, ME.y, 260); }
 }
+const voiceLevel = pid => { if (pid === myId) return VOICE.level; let l = 0; for (const v of VOICE.calls.values()) if (v.pid === pid) l = Math.max(l, v.level); return l; };
 const speaking = pid => { if (pid === myId) return VOICE.level > 0.04; for (const v of VOICE.calls.values()) if (v.pid === pid && v.level > 0.04) return true; return false; };
 function leaveRoom(silent) {
   for (const v of VOICE.calls.values()) { try { v.call.close(); } catch (e) {} }
@@ -2149,13 +2150,19 @@ function makeAvatar(id) {
   add(geo('pbody2', () => new THREE.CylinderGeometry(0.36, 0.36, 0.42, 22)), pm, 0, 0.82, 0);   // 下の胴
   add(geo('pbody1', () => new THREE.CylinderGeometry(0.31, 0.31, 0.36, 22)), pm, 0, 1.2, 0);    // 上の胴
   add(geo('pneck', () => new THREE.CylinderGeometry(0.24, 0.24, 0.09, 20)), pm, 0, 1.43, 0);   // 首
-  add(geo('phead2', () => new THREE.CylinderGeometry(0.28, 0.28, 0.28, 22)), pm, 0, 1.62, 0);  // 頭
-  add(geo('pdome', () => new THREE.SphereGeometry(0.28, 22, 12, 0, Math.PI * 2, 0, Math.PI / 2)), pm, 0, 1.76, 0); // ドーム
-  // 大きな目
-  for (const sx of [-1, 1]) {
-    const e = add(geo('peye', () => new THREE.SphereGeometry(0.115, 16, 12)), white, sx * 0.12, 1.7, -0.22); e.scale.z = 0.7;
-    add(geo('ppupil', () => new THREE.SphereGeometry(0.055, 12, 10)), black, sx * 0.12, 1.69, -0.3);
+  // 口の中（話すと見える）
+  add(geo('pmouth', () => new THREE.CylinderGeometry(0.235, 0.235, 0.02, 20)), mat('pmouthm', () => new THREE.MeshBasicMaterial({ color: 0x220808 })), 0, 1.47, 0);
+  add(geo('ptongue', () => new THREE.SphereGeometry(0.11, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2)), mat('ptongm', () => new THREE.MeshPhongMaterial({ color: 0xc8455a })), 0, 1.475, -0.06).scale.set(1, 0.35, 1.2);
+  // 頭（首の後ろを支点にパカッと開く）
+  const HP = new THREE.Vector3(0, 1.475, 0.27), headG = new THREE.Group(); headG.position.copy(HP); g.add(headG);
+  const addH = (gm, m, x, y, z) => add(gm, m, x - HP.x, y - HP.y, z - HP.z, headG);
+  addH(geo('phead2', () => new THREE.CylinderGeometry(0.28, 0.28, 0.28, 22)), pm, 0, 1.62, 0);  // 頭
+  addH(geo('pdome', () => new THREE.SphereGeometry(0.28, 22, 12, 0, Math.PI * 2, 0, Math.PI / 2)), pm, 0, 1.76, 0); // ドーム
+  for (const sx of [-1, 1]) { // 大きな目
+    const e = addH(geo('peye', () => new THREE.SphereGeometry(0.115, 16, 12)), white, sx * 0.12, 1.7, -0.22); e.scale.z = 0.7;
+    addH(geo('ppupil', () => new THREE.SphereGeometry(0.055, 12, 10)), black, sx * 0.12, 1.69, -0.3);
   }
+  parts.head = headG;
   // 腕（肩で回す）
   for (const sx of [-1, 1]) {
     const sh = new THREE.Group(); sh.position.set(sx * 0.38, 1.3, 0); sh.rotation.z = sx * 0.12; g.add(sh);
@@ -2163,9 +2170,9 @@ function makeAvatar(id) {
     add(geo('pshoulder', () => new THREE.SphereGeometry(0.065, 10, 8)), pm, 0, 0, 0, sh);
     parts[sx < 0 ? 'armL' : 'armR'] = sh;
   }
-  const lamp = add(geo('plamp', () => new THREE.SphereGeometry(0.05, 8, 6)), mat('plamp', () => new THREE.MeshBasicMaterial({ color: 0xfff6d0, fog: false })), 0, 1.98, -0.12);
+  add(geo('plamp', () => new THREE.SphereGeometry(0.05, 8, 6)), mat('plamp', () => new THREE.MeshBasicMaterial({ color: 0xfff6d0, fog: false })), 0, 1.98 - HP.y, -0.12 - HP.z, headG);
   const tag = textSprite(nameOf(id), c); tag.position.y = 2.3; g.add(tag);
-  g.userData.parts = parts; g.userData.walk = 0;
+  g.userData.parts = parts; g.userData.walk = 0; g.userData.open = 0;
   return g;
 }
 function makeMonMesh(type) {
@@ -2392,6 +2399,12 @@ function syncScene(dt, t) {
     const U = m.userData, mv = U.px != null ? Math.hypot(v.cx - U.px, v.cy - U.py) / Math.max(dt, 0.001) : 0; U.px = v.cx; U.py = v.cy;
     U.walk += dt * Math.min(mv, 260) / 22; const sw = mv > 15 ? Math.sin(U.walk) * 0.55 : 0;
     if (U.parts) { U.parts.legL.rotation.x = sw; U.parts.legR.rotation.x = -sw; U.parts.armL.rotation.x = -sw * 0.8; U.parts.armR.rotation.x = sw * 0.8; }
+    { // 話している間は喉と頭が開く（声が大きいほど大きく）。AI仲間はセリフ中に口パク
+      const lv = voiceLevel(id), say = FX.says[id];
+      const tgt = lv > 0.02 ? clamp(lv * 9, 0.15, 0.65) : say ? 0.3 * (0.5 + 0.5 * Math.sin(t * 17 + id)) : 0;
+      U.open += (tgt - U.open) * Math.min(1, dt * 16);
+      if (U.parts && U.parts.head) U.parts.head.rotation.x = U.open;
+    }
     m.position.set(v.cx * SC, (v.z || 0) + Math.abs(sw) * 0.04, v.cy * SC); m.rotation.y = -v.yaw - Math.PI / 2; m.scale.y = v.cr ? 0.68 : 1;
   }
   for (const [id, m] of MESH.players) if (!V.players.has(id) || id === myId) { world.remove(m); MESH.players.delete(id); }
