@@ -1,0 +1,2691 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>R.E.P.O. オリジナル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=M+PLUS+Rounded+1c:wght@500;800&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{--y:#ffd84d;--r:#e5332a;--bg:#070708;--fg:#ece8df;--mu:#9a958b;color-scheme:dark}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:'M PLUS Rounded 1c','Hiragino Sans','Meiryo',sans-serif;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:none}
+#gl,#hud{position:fixed;inset:0;width:100%;height:100%;display:block}
+#hud{pointer-events:none}
+.scr{position:fixed;inset:0;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;background:radial-gradient(ellipse at 50% 30%,rgba(40,30,10,.96),rgba(4,4,6,.98) 70%);padding:24px 16px;box-sizing:border-box;text-align:center;touch-action:pan-y}
+.scr.show{display:flex}
+.scr>*{max-width:640px;width:100%}
+h1{font-family:'Dela Gothic One',sans-serif;font-size:clamp(40px,11vw,84px);margin:12px 0 0;letter-spacing:.08em;color:var(--y);text-shadow:0 0 24px rgba(255,216,77,.45),4px 4px 0 #6b1a12}
+h2{font-family:'Dela Gothic One',sans-serif;font-size:clamp(26px,7vw,40px);margin:12px 0}
+.sub{color:var(--mu);margin:4px 0 14px;font-size:15px}
+.box{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px;margin:8px 0;text-align:left;font-size:14px;line-height:1.7;box-sizing:border-box}
+.box b{color:var(--y)}
+.btn{font:inherit;font-weight:800;font-size:18px;border:0;border-radius:12px;padding:14px 22px;margin:6px auto;cursor:pointer;background:var(--y);color:#2a1d00;box-shadow:0 4px 0 #9c7a12;display:block;width:min(320px,100%)}
+.btn.sec{background:#3a3a40;color:var(--fg);box-shadow:0 4px 0 #1c1c20}
+.btn:active{transform:translateY(3px);box-shadow:none}
+.btn:disabled{opacity:.4}
+.row{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;margin:6px 0}
+.row .btn{margin:0;width:auto;flex:1;min-width:140px}
+input.tx{font:inherit;font-weight:800;font-size:17px;padding:12px;border-radius:10px;border:2px solid #555;background:#141418;color:#fff;width:150px;text-align:center}
+.shopg{display:grid;grid-template-columns:1fr;gap:8px;margin:8px 0}
+.si{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 12px;text-align:left}
+.si .ic{font-size:28px;width:38px;text-align:center}
+.si .t{flex:1;font-size:13px;color:var(--mu)}
+.si .t b{display:block;color:var(--fg);font-size:15px}
+.si button{font:inherit;font-weight:800;border:0;border-radius:10px;padding:10px 12px;background:var(--y);color:#2a1d00;min-width:88px;cursor:pointer}
+.si button:disabled{background:#444;color:#999}
+.money{font-size:22px;font-weight:800;color:var(--y);margin:4px 0}
+.stat{display:flex;justify-content:space-between;border-bottom:1px dashed rgba(255,255,255,.12);padding:4px 0}
+.code{font-family:'Dela Gothic One',sans-serif;font-size:44px;letter-spacing:.2em;color:var(--y)}
+.mem{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.05);margin:4px 0;text-align:left}
+.ais{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0}
+.ai{font:inherit;font-weight:800;font-size:14px;padding:9px 12px;border-radius:999px;border:2px solid #555;background:#1a1a1f;color:#bbb;cursor:pointer}
+.ai.on{color:#111;border-color:#fff}
+#chat{position:fixed;left:14px;bottom:14px;z-index:9;max-width:min(360px,60vw);pointer-events:none;font-size:13px;font-weight:800;line-height:1.5;text-shadow:0 1px 3px #000;display:none}
+#chat div{background:rgba(0,0,0,.45);padding:2px 8px;border-radius:6px;margin-top:3px}
+.mem i{width:16px;height:16px;border-radius:50%;display:inline-block}
+#touch{position:fixed;inset:0;z-index:10;pointer-events:none;display:none}
+#touch.on{display:block}
+.tb{position:absolute;right:max(14px,env(safe-area-inset-right));width:62px;height:62px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(20,20,24,.55);color:#fff;font:800 13px 'M PLUS Rounded 1c',sans-serif;pointer-events:auto;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.1;touch-action:none}
+.tb.big{width:78px;height:78px;font-size:15px}
+.tb.grab{background:rgba(79,160,247,.55)}
+.tb.act{background:rgba(229,51,42,.55)}
+.tb.on{background:rgba(79,195,247,.75);border-color:#fff}
+.stk{position:absolute;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.05);display:none}
+.stk i{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:50%;background:rgba(255,255,255,.35)}
+#bFull{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:12;display:none;width:40px;height:40px;border-radius:10px;border:2px solid rgba(255,255,255,.35);background:rgba(20,20,24,.6);color:#fff;font-size:20px;line-height:36px;text-align:center;cursor:pointer;touch-action:none}
+#bFull.on{display:block}
+#bMic{position:fixed;top:10px;left:calc(50% + 30px);z-index:41;display:none;height:40px;padding:0 12px;border-radius:10px;border:2px solid rgba(255,255,255,.35);background:rgba(20,20,24,.7);color:#fff;font:800 14px "M PLUS Rounded 1c",sans-serif;cursor:pointer}
+#bMic.on{display:block}
+#bMic.live{background:#2e8f4a;border-color:#7dffa0}
+#bMic.talk{box-shadow:0 0 0 4px rgba(125,255,160,.6)}
+#bDepart{position:fixed;left:50%;top:62%;transform:translateX(-50%);z-index:13;display:none;font:800 24px "M PLUS Rounded 1c",sans-serif;padding:14px 34px;border:0;border-radius:16px;background:#7dffa0;color:#0b2414;box-shadow:0 5px 0 #2e8f4a,0 0 30px rgba(125,255,160,.6);cursor:pointer;animation:dp 1s infinite alternate}
+#bDepart.on{display:block}
+@keyframes dp{to{transform:translateX(-50%) scale(1.06)}}
+#netMsg{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:40;background:rgba(0,0,0,.8);padding:8px 14px;border-radius:10px;font-weight:800;font-size:14px;display:none;pointer-events:none}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<canvas id="hud"></canvas>
+<div id="netMsg"></div>
+<div id="chat"></div>
+<div id="bFull" title="全画面表示">⛶</div>
+<button id="bMic" title="マイク（V）">🎤 OFF</button>
+<button id="bDepart">🚌 出発！</button>
+
+<div id="touch">
+  <div class="stk" id="stkL"><i></i></div>
+  <div class="tb big grab" id="bGrab" style="bottom:calc(110px + env(safe-area-inset-bottom))">つかむ</div>
+  <div class="tb big act" id="bAct" style="bottom:calc(20px + env(safe-area-inset-bottom));right:calc(max(14px,env(safe-area-inset-right)) + 88px)">アクション</div>
+  <div class="tb" id="bDash" style="bottom:calc(20px + env(safe-area-inset-bottom))">ダッシュ</div>
+  <div class="tb" id="bJump" style="bottom:calc(116px + env(safe-area-inset-bottom));right:calc(max(14px,env(safe-area-inset-right)) + 96px)">ジャンプ</div>
+  <div class="tb" id="bCrouch" style="bottom:calc(190px + env(safe-area-inset-bottom));right:calc(max(14px,env(safe-area-inset-right)) + 96px)">しゃがむ</div>
+  <div class="tb" id="bHeal" style="bottom:calc(200px + env(safe-area-inset-bottom))">回復</div>
+  <div class="tb" id="bFlash" style="bottom:calc(272px + env(safe-area-inset-bottom))">閃光</div>
+  <div class="tb act" id="bShoot" style="bottom:calc(344px + env(safe-area-inset-bottom));display:none">射撃</div>
+</div>
+
+<div class="scr show" id="sTitle">
+  <h1>R.E.P.O.</h1>
+  <div class="sub">オリジナル版 ― 廃墟回収業者（一人称・最大6人オンライン）</div>
+  <div class="row"><span>名前</span><input class="tx" id="inName" maxlength="8" placeholder="回収員"></div>
+  <div class="box"><b>🤖 一緒に探索するAI仲間</b>（タップで選択・最大5人）
+    <div class="ais" id="aiPick"></div>
+    <div class="sub" style="margin:0;font-size:12px">ゲーム内のAIキャラです（本物のサービスには接続しません）</div>
+  </div>
+  <div class="box"><b>ソロ</b>
+    <button class="btn" id="bSolo">ひとりで はじめから</button>
+    <button class="btn sec" id="bCont" style="display:none">ひとりで つづきから</button>
+  </div>
+  <div class="box"><b>🌐 オンライン（最大6人）</b>
+    <button class="btn" id="bHost">🏠 部屋を作る</button>
+    <div class="row"><input class="tx" id="inCode" maxlength="5" placeholder="部屋コード" autocomplete="off" style="text-transform:uppercase"><button class="btn sec" id="bJoin">🚪 部屋に入る</button></div>
+  </div>
+  <div class="box">借金を返すため、モンスターが徘徊する<b>ランダム生成の廃墟</b>に潜り、<b>黄色く光るお宝</b>を回収して<b>ノルマ</b>を達成しよう。<br>
+  ① お宝をつかんで運ぶ（ぶつけると<b>壊れて価値が下がる</b>）<br>
+  ② <b>カートは黄色い持ち手をつかんで押す</b>。何個でも積めるが、<b>真ん中にきちんと載せないと落ちる</b>。放置したカートは揺れると中身がこぼれる<br>
+  ③ <b>納品エリア</b>に置いて<b>赤いボタン</b> → 上から箱がドスンと落ちてきて回収、現金化（<b>エリアからはみ出た物は壊れる</b>）<br>
+  ④ ノルマ達成 → <b>マップが暗転し、モンスターが無限湧き！</b> 全員バスに乗って<b>「出発」</b>で脱出<br>
+  ⑤ 物を<b>速くぶつける・上から叩きつける</b>と敵にダメージ。<b>カートで轢くと敵に10ダメージ</b>（仲間はダメージなし）。STR（持ち上げパワー）を上げると敵も持ち上げられる。持ったまま素早く振り向くと<b>遠心力</b>で外に振られ、回しすぎると飛んでいく。<b>拳銃</b>（ショップ）は1現場5発・50ダメージ。<b>倒した敵は高価な球を落とす</b><br>
+  ⑥ 迷宮は5種類（洋館・病院・工場・学校・遺跡）。家具の中や上にもお宝。<b>穴に落ちると即死</b>。死ぬと頭が残り、<b>頭を納品するとHP1で復活</b><br>
+  ⑦ 稼いだお金でショップ強化（チーム共通）。<b>全滅するとLv1からやり直し</b>。</div>
+  <div class="box" id="ctrlPC"><b>PC操作</b>　V：マイクON/OFF（オンライン）/ 全画面で開始（⛶ボタンで切り替え）/ WASD：移動 / <b>マウスを動かす：視点</b>（矢印キーでも回せる）/ <b>左クリック長押し：つかむ</b>（ホイールで近づける・遠ざける）/ Shift：ダッシュ / Space：ジャンプ / C：しゃがむ（静かに動ける）/ E：アクション（納品・脱出・カートから取り出す）/ Q：回復 / F：閃光弾 / <b>右クリック・G：拳銃</b> / Esc：メニュー</div>
+  <div class="box"><b>🎮 コントローラー</b>　Lスティック：移動 / Rスティック：視点 / <b>ZR・ZL：つかむ</b>（<b>ZL＋Rスティック下で近づける・上で遠ざける</b>）/ A・B：ジャンプ / X：しゃがむ / Y：アクション（納品・出発）/ Lスティック押し込み：ダッシュ / L：回復 / <b>R：拳銃</b> / 十字キー上：閃光 / ＋：メニュー</div>
+  <div class="box"><b>スマホ操作</b>　左側をドラッグ：移動 / 右側をドラッグ：視点 / <b>つかむ</b>ボタン：つかむ・離す / ジャンプ・しゃがむ・アクション・ダッシュ・回復・閃光ボタン</div>
+  <div id="bestTxt" class="sub"></div>
+</div>
+
+<div class="scr" id="sLobby">
+  <h2>🌐 オンラインの部屋</h2>
+  <div class="sub">部屋コード</div>
+  <div class="code" id="lbCode">-----</div>
+  <div class="sub" id="lbInfo"></div>
+  <div id="lbList"></div>
+  <div id="lbAi" class="box"><b>🤖 AI仲間を追加</b>（6人まで。人が入ると自動で外れます）<div class="ais" id="aiPick2"></div></div>
+  <button class="btn" id="bLbNew">みんなで はじめから</button>
+  <button class="btn sec" id="bLbCont" style="display:none">みんなで つづきから</button>
+  <button class="btn sec" id="bLbLeave">部屋を出る</button>
+</div>
+
+<div class="scr" id="sShop">
+  <h2>🚌 バス内ショップ</h2>
+  <div class="money" id="shopMoney"></div>
+  <div class="sub" id="shopNext"></div>
+  <div class="shopg" id="shopList"></div>
+  <button class="btn" id="bGo">次の現場へ出発</button>
+  <button class="btn sec" id="bToTitle">タイトルへ</button>
+</div>
+
+<div class="scr" id="sClear">
+  <h2 style="color:var(--y)">脱出成功！</h2>
+  <div class="box" id="clearStats"></div>
+  <button class="btn" id="bShop">ショップへ</button>
+</div>
+
+<div class="scr" id="sOver">
+  <h2 style="color:var(--r)">回収チームは全滅した…</h2>
+  <div class="sub">ペナルティ：現場Lvは <b>Lv.1</b> にリセットされます</div>
+  <div class="box" id="overStats"></div>
+  <button class="btn" id="bRetry">Lv.1 からやり直す</button>
+  <button class="btn sec" id="bOverTitle">タイトルへ</button>
+</div>
+
+<div class="scr" id="sPause">
+  <h2>メニュー</h2>
+  <div class="sub" id="pauseInfo"></div>
+  <button class="btn" id="bResume">ゲームに戻る</button>
+  <button class="btn sec" id="bQuit">タイトルへ</button>
+</div>
+
+<script>
+'use strict';
+// ================= 基本 =================
+const T = 48, TS = 2, SC = TS / T, WALL_H = 3, EYE = 1.55;
+const $ = id => document.getElementById(id);
+const gl = $('gl'), hud = $('hud'), hx = hud.getContext('2d');
+const rnd = (a, b) => a + Math.random() * (b - a);
+const ri = (a, b) => Math.floor(a + Math.random() * (b - a + 1));
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const yen = n => '$' + Math.round(n).toLocaleString();
+const angDiff = (a, b) => { let d = a - b; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; return d; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let VW = 0, VH = 0, DPR = 1;
+const IS_MOBILE = matchMedia('(pointer:coarse)').matches;
+let isTouch = IS_MOBILE;
+
+// ================= 音 =================
+let AC = null, NB = null;
+function initAudio() {
+  try { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); } catch (e) { AC = null; }
+}
+function tone(f, dur, type, vol, slide = 0, delay = 0) {
+  if (!AC || vol < 0.003) return;
+  const t = AC.currentTime + delay, o = AC.createOscillator(), g = AC.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t);
+  if (slide) o.frequency.linearRampToValueAtTime(Math.max(20, f + slide), t + dur);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  o.connect(g).connect(AC.destination); o.start(t); o.stop(t + dur + 0.02);
+}
+function noiseBurst(dur, vol, lp, delay = 0) {
+  if (!AC || vol < 0.003) return;
+  if (!NB) { NB = AC.createBuffer(1, AC.sampleRate, AC.sampleRate); const d = NB.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+  const t = AC.currentTime + delay, s = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain();
+  s.buffer = NB; f.type = 'lowpass'; f.frequency.value = lp;
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  s.connect(f).connect(g).connect(AC.destination); s.start(t); s.stop(t + dur + 0.02);
+}
+function volAt(x, y) { if (!ME) return 1; return clamp(1 - Math.hypot(x - ME.x, y - ME.y) / 900, 0, 1); }
+function sfx(n, v = 1) {
+  if (!AC) return;
+  switch (n) {
+    case 'crash': noiseBurst(0.18, 0.3 * v, 2600); tone(rnd(300, 600), 0.08, 'triangle', 0.06 * v, -150); break;
+    case 'break': noiseBurst(0.5, 0.5 * v, 5000); tone(1400, 0.25, 'triangle', 0.1 * v, -900); tone(900, 0.2, 'square', 0.05 * v, -500, 0.05); break;
+    case 'sell': [880, 1175, 1568, 2093].forEach((f, i) => tone(f, 0.18, 'square', 0.06 * v, 0, i * 0.07)); break;
+    case 'hit': tone(140, 0.3, 'sawtooth', 0.25, -80); noiseBurst(0.2, 0.35, 900); break;
+    case 'growl': tone(62, 0.7, 'sawtooth', 0.16 * v, -18); tone(93, 0.5, 'square', 0.05 * v, -30); break;
+    case 'shriek': tone(900, 0.4, 'sawtooth', 0.08 * v, 700); break;
+    case 'grab': tone(520, 0.06, 'sine', 0.06, 260); break;
+    case 'drop': tone(400, 0.06, 'sine', 0.05, -200); break;
+    case 'clunk': tone(180, 0.09, 'square', 0.07 * v, -60); break;
+    case 'beat': tone(52, 0.16, 'sine', 0.4, -12); tone(48, 0.16, 'sine', 0.3, -12, 0.2); break;
+    case 'alarm': for (let i = 0; i < 4; i++) { tone(660, 0.22, 'square', 0.08, 0, i * 0.5); tone(440, 0.22, 'square', 0.08, 0, i * 0.5 + 0.25); } break;
+    case 'flash': noiseBurst(0.7, 0.4 * v, 7000); tone(2400, 0.4, 'sine', 0.08 * v, -1800); break;
+    case 'monhit': tone(220, 0.15, 'sawtooth', 0.12 * v, -120); break;
+    case 'mondie': tone(160, 0.6, 'sawtooth', 0.15 * v, -130); noiseBurst(0.4, 0.2 * v, 1200); break;
+    case 'heal': tone(523, 0.12, 'sine', 0.08); tone(784, 0.2, 'sine', 0.08, 0, 0.1); break;
+    case 'deny': tone(180, 0.15, 'square', 0.07); tone(140, 0.2, 'square', 0.07, 0, 0.12); break;
+    case 'step': noiseBurst(0.05, 0.05 * v, 500); break;
+  }
+}
+
+// ================= データ =================
+const ITEMS = [
+  { n: 'ガラスの花瓶', e: '🏺', r: 11, m: 0.8, v: [300, 600], f: 1.5, w: 10 },
+  { n: '置き時計', e: '🕰️', r: 13, m: 1.2, v: [400, 800], f: 1.1, w: 10 },
+  { n: '古い絵画', e: '🖼️', r: 16, m: 1.3, v: [500, 1100], f: 0.9, w: 8 },
+  { n: '水晶玉', e: '🔮', r: 10, m: 0.7, v: [600, 1000], f: 1.8, w: 7 },
+  { n: '真空管ラジオ', e: '📻', r: 14, m: 1.6, v: [350, 700], f: 0.8, w: 9 },
+  { n: '宝石', e: '💎', r: 8, m: 0.3, v: [700, 1300], f: 1.0, w: 5 },
+  { n: '地球儀', e: '🌐', r: 15, m: 1.3, v: [300, 600], f: 0.9, w: 8 },
+  { n: 'バイオリン', e: '🎻', r: 15, m: 0.9, v: [700, 1400], f: 1.3, w: 5 },
+  { n: 'トロフィー', e: '🏆', r: 12, m: 1.4, v: [400, 700], f: 0.5, w: 8 },
+  { n: 'テディベア', e: '🧸', r: 13, m: 0.6, v: [150, 300], f: 0.15, w: 8 },
+  { n: 'ワイングラス', e: '🍷', r: 9, m: 0.3, v: [250, 500], f: 2.0, w: 8 },
+  { n: '黄金の像', e: '🗿', r: 24, m: 4.5, v: [2500, 4000], f: 0.6, w: 2, big: 1 },
+  { n: 'グランドピアノ', e: '🎹', r: 28, m: 6, v: [4000, 6000], f: 0.7, w: 1, big: 1 },
+  { n: '古い甲冑', e: '🛡️', r: 22, m: 3.5, v: [1500, 2600], f: 0.4, w: 2, big: 1 },
+  { n: '魂のオーブ', e: '💠', r: 11, m: 0.6, v: [0, 0], f: 1.2, w: 0 },
+  { n: '頭', e: '💀', r: 11, m: 1, v: [0, 0], f: 0, w: 0, head: 1 },
+];
+const ORB = ITEMS.findIndex(i => i.n === '魂のオーブ'), HEAD = ITEMS.findIndex(i => i.head);
+// 5種類の迷宮（共通：部屋と通路・バス・納品エリア・敵／新要素：家具・穴・暗さ・お宝の値段）
+const STAGES = [
+  { n: '古い洋館', d: '家具がいっぱい。クローゼットやタンスの中にお宝', pal: [['#3b3027', '#33291f'], ['#3a2f33', '#31272b'], ['#38342a', '#2f2b22'], ['#4a2f2f', '#3e2626']], wall: ['#b8a58f', '#b39aa1', '#b2a88f', '#a88f86'], hall: '#2e2a28', furn: ['closet', 'wardrobe', 'shelf', 'table', 'sofa'], furnMul: 1.3, pits: 0, light: 0.88, amb: 1 },
+  { n: '廃病院', d: '停電で暗い。冷蔵庫や薬品棚にお宝', pal: [['#b9c4bf', '#a9b5b0'], ['#8fa49e', '#80958f'], ['#c4c0b4', '#b3afa3']], wall: ['#c8d4d0', '#a9bdb7', '#d0ccc0'], hall: '#3c4442', furn: ['bed', 'fridge', 'cabinet', 'table'], furnMul: 1, pits: 0, light: 0.5, amb: 0.65 },
+  { n: '廃工場', d: '床に穴！ 落ちたら即死', pal: [['#4a4a46', '#40403c'], ['#525046', '#47453c'], ['#3f4448', '#363b3f']], wall: ['#8a8a84', '#9a8f7a', '#7f8a90'], hall: '#333330', furn: ['crate', 'shelf', 'locker'], furnMul: 1, pits: 4, light: 0.8, amb: 0.9 },
+  { n: '夜の学校', d: 'ロッカーや机が並ぶ。敵が少し多い', pal: [['#6b5434', '#5e4a2e'], ['#4f5a3c', '#45502f'], ['#5b5048', '#4f453e']], wall: ['#d8d0b8', '#c0c8b0', '#c8c0d0'], hall: '#4a4136', furn: ['desk', 'locker', 'shelf', 'closet'], furnMul: 1.2, pits: 0, light: 0.7, amb: 0.85, monBonus: 1 },
+  { n: '地下遺跡', d: '穴だらけで暗いが、高価なお宝が多い', pal: [['#4e4536', '#433b2d'], ['#3d4a44', '#34403a'], ['#4a4038', '#3f362f']], wall: ['#8c7f68', '#7d8a7a', '#8a7a6a'], hall: '#2b2620', furn: ['crate', 'pedestal', 'shelf'], furnMul: 1, pits: 8, light: 0.45, amb: 0.6, valMul: 1.4 },
+];
+const stageOf = lv => STAGES[(lv - 1) % STAGES.length];
+// 家具：幅・奥行・高さ（m）、物を置ける高さ sup、中が空いている open
+const FURN = {
+  closet: { n: 'クローゼット', w: 1.8, d: 1.3, h: 2.2, sup: 0.85, col: 0x6b4a2b, open: 1 },
+  wardrobe: { n: 'タンス', w: 1.8, d: 1.1, h: 1.25, sup: 1.25, col: 0x5a3b22 },
+  fridge: { n: '冷蔵庫', w: 1.4, d: 1.3, h: 1.9, sup: 0.85, col: 0xe8ecec, open: 1, cold: 1 },
+  shelf: { n: '棚', w: 1.8, d: 1.0, h: 1.6, sup: 0.95, col: 0x6f7378, open: 1 },
+  table: { n: 'テーブル', w: 1.7, d: 1.4, h: 0.75, sup: 0.75, col: 0x7a5530, legs: 1 },
+  sofa: { n: 'ソファ', w: 1.8, d: 1.1, h: 0.85, sup: 0.45, col: 0x5a2e3a },
+  bed: { n: 'ベッド', w: 1.8, d: 1.8, h: 0.55, sup: 0.55, col: 0xdfe6e6 },
+  cabinet: { n: '薬品棚', w: 1.6, d: 1.0, h: 1.0, sup: 1.0, col: 0xc8d0cc },
+  crate: { n: '木箱', w: 1.5, d: 1.5, h: 1.0, sup: 1.0, col: 0x8a6a3a },
+  locker: { n: 'ロッカー', w: 1.6, d: 1.0, h: 1.95, sup: 0.85, col: 0x4f6b7a, open: 1 },
+  desk: { n: '机', w: 1.6, d: 1.1, h: 0.75, sup: 0.75, col: 0x8a6b45, legs: 1 },
+  pedestal: { n: '台座', w: 1.1, d: 1.1, h: 0.9, sup: 0.9, col: 0x8a8578 },
+};
+const ITEM_W = ITEMS.reduce((s, i) => s + i.w, 0);
+const MT = ['wander', 'runner', 'brute'];
+const MON_ID = 1000000; // つかむ時の敵のID（お宝のIDと区別）
+const MONS = {
+  wander: { n: 'モコミチ', r: 15, spd: 62, chase: 128, hp: 70, dmg: 10, sight: 330, orb: [500, 1500], lift: 2 },
+  runner: { n: 'ハシリ', r: 12, spd: 85, chase: 232, hp: 35, dmg: 14, sight: 380, orb: [200, 600], lift: 3 },
+  brute: { n: 'オオモノ', r: 26, spd: 52, chase: 96, hp: 220, dmg: 45, sight: 290, orb: [8000, 30000], lift: 0 },
+};
+const SHOP = [
+  { id: 'hp', k: 'up', ic: '❤️', n: '体力強化', d: '全員の最大HP +25', base: 500 },
+  { id: 'sta', k: 'up', ic: '⚡', n: 'スタミナ強化', d: '全員の最大スタミナ +30', base: 400 },
+  { id: 'reach', k: 'up', ic: '🧲', n: 'つかむ距離', d: '遠くの物や敵をつかめる（最大Lv5）', base: 450, max: 5 },
+  { id: 'str', k: 'up', ic: '💪', n: 'STR（持ち上げパワー）', d: '重い物を楽に持てる・上や遠くへ強く投げられる・遠心力に負けにくい（最大Lv10）', base: 600, max: 10 },
+  { id: 'spd', k: 'up', ic: '👟', n: '脚力強化', d: '移動速度 +8%', base: 500 },
+  { id: 'light', k: 'up', ic: '🔦', n: '高性能ライト', d: 'ライトの照射距離アップ', base: 450 },
+  { id: 'gun', k: 'gun', ic: '🔫', n: '拳銃', d: '1回の現場で5発・敵に50ダメージ（右クリック / G / コントローラーR）。一度買えばずっと使える', base: 1200 },
+  { id: 'heal', k: 'inv', ic: '🩹', n: '回復パック', d: 'チーム共用。HPを50回復（Q / 回復）', base: 300 },
+  { id: 'flash', k: 'inv', ic: '💥', n: '閃光弾', d: 'チーム共用。周囲のモンスターを気絶（F / 閃光）', base: 400 },
+];
+const AI_BOTS = [
+  { key: 'chatgpt', name: 'ChatGPT', col: '#10a37f', lines: {
+    start: ['了解しました！効率よくお宝を探しましょう', 'タスクを開始します。まずは近くの部屋から'],
+    found: ['お宝を見つけました。運びますね', 'これは価値がありそうです！'],
+    sell: ['納品完了です！', '目標達成まであと少しです'],
+    mon: ['モンスターを検知！いったん離れます', '危険です、回避します！'],
+    hurt: ['痛っ…大丈夫です、続けます'], die: ['申し訳ありません、ここまでのようです…'],
+    death: ['バスへ向かいましょう！'], idle: ['次はどこを探しましょうか？'] } },
+  { key: 'gemini', name: 'Gemini', col: '#4f8cff', lines: {
+    start: ['探検スタート✨ ワクワクするね！', 'いろんな部屋をマルチに調べてみる！'],
+    found: ['見て見て、キラキラしてる✨', 'こっちに良い物があったよ！'],
+    sell: ['ナイス納品！いい感じ✨', 'お金が増えた〜！'],
+    mon: ['きゃっ、何かいる！逃げよう！', 'あれはヤバそう…！'],
+    hurt: ['いたた…！'], die: ['ごめん、あとはお願い…✨'],
+    death: ['急いでバスへ！'], idle: ['ほかに何かないかな〜'] } },
+  { key: 'grok', name: 'Grok', col: '#c9c9c9', lines: {
+    start: ['ハハッ、廃墟探索か。退屈しなさそうだ', 'さて、宇宙の真理…じゃなくてお宝を探すか'],
+    found: ['お、いい物みっけ。落とすなよ？俺がな', 'これ高く売れるやつだろ'],
+    sell: ['チャリン♪ 稼いだ稼いだ', 'いい商売だな'],
+    mon: ['うわ、キモいの来た！戦略的撤退！', 'あいつとは友達になれそうにないな'],
+    hurt: ['おい、痛ぇぞ！'], die: ['…まあ、こういう日もある'],
+    death: ['ほら走れ走れ！バスだ！'], idle: ['暇だな。何か壊していい？'] } },
+  { key: 'claude', name: 'Claude', col: '#d97757', lines: {
+    start: ['よろしくお願いします。慎重に進みましょう', 'まずは安全を確認しながら探索しますね'],
+    found: ['お宝がありました。壊さないよう丁寧に運びます', '良い物を見つけました'],
+    sell: ['無事に納品できました', 'ノルマに近づいていますね'],
+    mon: ['モンスターです。無理せず距離を取ります', '危ないので離れましょう'],
+    hurt: ['っ…まだ大丈夫です'], die: ['すみません、ここで倒れてしまいました…'],
+    death: ['全員でバスに戻りましょう！'], idle: ['手伝えることはありますか？'] } },
+];
+const botDef = key => AI_BOTS.find(b => b.key === key);
+let AI_SEL = (() => { try { const v = JSON.parse(localStorage.getItem('repoOriginalAI')); return Array.isArray(v) ? v : []; } catch (e) { return []; } })();
+const PCOL = ['#e67e22', '#3fa7ff', '#5ad16b', '#e84393', '#f1c40f', '#a66bff'];
+const SAVE_KEY = 'repoOriginalSave', BEST_KEY = 'repoOriginalBest', NAME_KEY = 'repoOriginalName';
+const newRun = () => ({ gun: false, level: 1, money: 0, up: { hp: 0, sta: 0, str: 0, reach: 0, spd: 0, light: 0 }, inv: { heal: 1, flash: 0 }, total: 0 });
+function store(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+function load(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+let RUN = newRun();
+const maxHp = () => 100 + 25 * RUN.up.hp;
+const maxSta = () => 100 + 30 * RUN.up.sta;
+const strLv = () => Math.min(10, RUN.up.str || 0);
+const reachLv = () => Math.min(5, RUN.up.reach || 0);
+const reachExtra = () => 35 * reachLv(); // つかめる距離の上乗せ（Lv5で約+7m）
+const strength = () => 1 + 0.3 * strLv();
+const throwCap = () => 420 + 60 * strLv(); // 持っている物の最高速度（Lvが高いほど遠くへ飛ぶ）
+const moveSpd = () => 150 * (1 + 0.08 * RUN.up.spd);
+const lightR = () => 300 + 45 * RUN.up.light;
+const quotaOf = lv => Math.round((2600 + 1500 * (lv - 1)) / 100) * 100;
+
+// ================= 状態 =================
+let MAP = null;   // 地形（全員共通・シードから生成）
+let G = null;     // ホストのシミュレーション
+let PL = new Map(); // ホスト：プレイヤー id→obj
+let ME = null;    // 自分（ホストでは PL の中の自分）
+let myId = 0;
+let V = null;     // 表示用の状態
+let GS = { sold: 0, quota: 1, death: 0, money: 0, heal: 0, flash: 0, lv: 1 };
+let ROSTER = [];  // [{id,name}]
+let playing = false;
+const NET = { peer: null, mode: null, code: '', conns: new Map(), conn: null, acc: 0, sendAcc: 0 };
+const isClient = () => NET.mode === 'client';
+
+// ================= マップ生成（シード） =================
+function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function bfs(M, tx, ty) {
+  const { W, H, g } = M, d = new Int16Array(W * H).fill(-1);
+  if (tx < 0 || ty < 0 || tx >= W || ty >= H || g[ty * W + tx]) return d;
+  const q = new Int32Array(W * H); let h = 0, t = 0;
+  d[ty * W + tx] = 0; q[t++] = ty * W + tx;
+  while (h < t) {
+    const i = q[h++], x = i % W, nd = d[i] + 1;
+    if (x > 0 && !g[i - 1] && d[i - 1] < 0) { d[i - 1] = nd; q[t++] = i - 1; }
+    if (x < W - 1 && !g[i + 1] && d[i + 1] < 0) { d[i + 1] = nd; q[t++] = i + 1; }
+    if (i >= W && !g[i - W] && d[i - W] < 0) { d[i - W] = nd; q[t++] = i - W; }
+    if (i < W * (H - 1) && !g[i + W] && d[i + W] < 0) { d[i + W] = nd; q[t++] = i + W; }
+  }
+  return d;
+}
+const solid = (tx, ty) => tx < 0 || ty < 0 || tx >= MAP.W || ty >= MAP.H || MAP.g[ty * MAP.W + tx] === 1;
+const solidAt = (x, y) => solid(Math.floor(x / T), Math.floor(y / T));
+function los(x0, y0, x1, y1) {
+  const dx = x1 - x0, dy = y1 - y0, d = Math.hypot(dx, dy), n = Math.ceil(d / 12);
+  for (let i = 1; i < n; i++) if (solidAt(x0 + dx * i / n, y0 + dy * i / n)) return false;
+  return true;
+}
+const inBus = q => { const r = MAP.truck.room; return q.x > r.x * T && q.x < (r.x + r.w) * T && q.y > r.y * T && q.y < (r.y + r.h) * T; };
+const inRect = (x, y, z, pad = 0) => x > z.x - pad && x < z.x + z.w + pad && y > z.y - pad && y < z.y + z.h + pad;
+function genMap(seed, lv) {
+  const R = mulberry(seed), rr = (a, b) => Math.floor(a + R() * (b - a + 1)), rp = a => a[Math.floor(R() * a.length)];
+  const W = Math.min(40 + lv * 3, 68), H = Math.min(32 + lv * 2, 54);
+  const g = new Uint8Array(W * H).fill(1), roomOf = new Int16Array(W * H).fill(-1);
+  const rooms = [], target = Math.min(7 + lv, 16);
+  for (let tries = 0; rooms.length < target && tries < 2000; tries++) {
+    const first = !rooms.length, w = first ? 9 : rr(5, 11), h = first ? 7 : rr(5, 8);
+    const r = { x: rr(2, W - w - 3), y: rr(2, H - h - 3), w, h };
+    if (rooms.every(o => !(r.x - 2 < o.x + o.w && r.x + r.w + 2 > o.x && r.y - 2 < o.y + o.h && r.y + r.h + 2 > o.y))) rooms.push(r);
+  }
+  rooms.forEach((r, i) => {
+    r.id = i; r.cx = (r.x + r.w / 2) * T; r.cy = (r.y + r.h / 2) * T;
+    r.style = i ? rr(0, 4) : -1; r.light = i === 0 || R() < stageOf(lv).light; r.fl = 1; r.flT = 1 + R() * 5;
+    for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) { g[y * W + x] = 0; roomOf[y * W + x] = i; }
+  });
+  const set = (x, y) => { if (x >= 1 && y >= 1 && x < W - 1 && y < H - 1) g[y * W + x] = 0; };
+  const corridor = (a, b) => {
+    const ax = Math.floor(a.x + a.w / 2), ay = Math.floor(a.y + a.h / 2), bx = Math.floor(b.x + b.w / 2), by = Math.floor(b.y + b.h / 2);
+    if (R() < 0.5) {
+      for (let x = Math.min(ax, bx); x <= Math.max(ax, bx) + 1; x++) { set(x, ay); set(x, ay + 1); }
+      for (let y = Math.min(ay, by); y <= Math.max(ay, by) + 1; y++) { set(bx, y); set(bx + 1, y); }
+    } else {
+      for (let y = Math.min(ay, by); y <= Math.max(ay, by) + 1; y++) { set(ax, y); set(ax + 1, y); }
+      for (let x = Math.min(ax, bx); x <= Math.max(ax, bx) + 1; x++) { set(x, by); set(x, by + 1); }
+    }
+  };
+  for (let i = 1; i < rooms.length; i++) {
+    let best = 0, bd = 1e9;
+    for (let j = 0; j < i; j++) { const d = Math.hypot(rooms[i].cx - rooms[j].cx, rooms[i].cy - rooms[j].cy); if (d < bd) { bd = d; best = j; } }
+    corridor(rooms[i], rooms[best]);
+  }
+  for (let k = 0; k < 2 + lv / 2; k++) {
+    const a = rp(rooms), b = rp(rooms);
+    if (a !== b && Math.hypot(a.cx - b.cx, a.cy - b.cy) < 26 * T) corridor(a, b);
+  }
+  const M = { seed, lv, W, H, g, roomOf, rooms, desks: [] };
+  const r0 = rooms[0];
+  M.truck = { room: r0, mon: { x: (r0.x + r0.w / 2) * T, y: (r0.y + 0.55) * T } };
+  const d0 = bfs(M, Math.floor(r0.cx / T), Math.floor(r0.cy / T));
+  rooms.forEach(r => r.dist = d0[Math.floor(r.cy / T) * W + Math.floor(r.cx / T)]);
+  M.others = rooms.slice(1).filter(r => r.dist > 0).sort((a, b) => a.dist - b.dist);
+  const nDesk = lv >= 4 ? 2 : 1, used = new Set(), others = M.others;
+  for (let k = 0; k < nDesk && others.length; k++) {
+    const lo = Math.floor(others.length * 0.35), hi = Math.max(lo, Math.floor(others.length * 0.8) - 1);
+    let r = others[rr(lo, hi)];
+    for (let t = 0; used.has(r) && t < 20; t++) r = rp(others);
+    if (used.has(r)) break;
+    used.add(r);
+    const zx = r.x + Math.floor(r.w / 2) - 2, zy = r.y + Math.floor(r.h / 2) - 1;
+    M.desks.push({ room: r, zone: { x: zx * T, y: zy * T, w: 3 * T, h: 2 * T }, btn: { x: (zx + 3.5) * T, y: (zy + 0.5) * T }, glow: 0 });
+  }
+  // ---- 家具と穴（0:床 1:壁 2:穴 3:家具）----
+  const ST = stageOf(lv); M.stage = ST; M.fh = new Float32Array(W * H); M.furn = [];
+  const r0i = M.rooms[0];
+  const keep = (tx, ty) => { // 納品エリア・ボタンのまわり、バスには置かない
+    if (M.roomOf[ty * W + tx] === 0) return true;
+    for (const d of M.desks) { if (tx >= d.zone.x / T - 1 && tx < (d.zone.x + d.zone.w) / T + 2 && ty >= d.zone.y / T - 1 && ty < (d.zone.y + d.zone.h) / T + 1) return true; }
+    return false;
+  };
+  const connected = () => {
+    const d = bfs(M, Math.floor(r0i.cx / T), Math.floor(r0i.cy / T));
+    for (const r of M.rooms) { let ok = false; for (let y = r.y; y < r.y + r.h && !ok; y++) for (let x = r.x; x < r.x + r.w && !ok; x++) if (d[y * W + x] >= 0) ok = true; if (!ok) return false; }
+    for (const dk of M.desks) if (d[Math.floor(dk.btn.y / T) * W + Math.floor(dk.btn.x / T)] < 0) return false;
+    return true;
+  };
+  for (const r of M.rooms.slice(1)) {
+    const cand = [];
+    for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) {
+      if (g[y * W + x] !== 0 || keep(x, y)) continue;
+      for (const [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) { // 壁を背にできるマス（入口はふさがない）
+        if (g[(y + dy) * W + (x + dx)] !== 1) continue;
+        const ax = dy ? 1 : 0, ay = dx ? 1 : 0;
+        if (g[(y + ay) * W + (x + ax)] === 1 || g[(y - ay) * W + (x - ax)] === 1) { if (!(R() < 0.6)) continue; }
+        if (g[(y + dy + ay) * W + (x + dx + ax)] !== 1 || g[(y + dy - ay) * W + (x + dx - ax)] !== 1) continue;
+        cand.push({ x, y, dx: -dx, dy: -dy }); break;
+      }
+    }
+    for (let i = cand.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [cand[i], cand[j]] = [cand[j], cand[i]]; }
+    const want = Math.round((r.w + r.h) / 3.2 * ST.furnMul);
+    let n = 0;
+    for (const c of cand) {
+      if (n >= want) break;
+      if (M.furn.some(f => Math.abs(f.x - c.x) + Math.abs(f.y - c.y) < 2 && R() < 0.5)) continue;
+      g[c.y * W + c.x] = 3;
+      if (!connected()) { g[c.y * W + c.x] = 0; continue; }
+      const type = ST.furn[Math.floor(R() * ST.furn.length)];
+      M.fh[c.y * W + c.x] = FURN[type].sup; M.furn.push({ x: c.x, y: c.y, dx: c.dx, dy: c.dy, type }); n++;
+    }
+  }
+  M.pits = [];
+  for (let k = 0, tries = 0; k < ST.pits + Math.floor(lv / 5) * 2 && tries < 300; tries++) {
+    const r = M.rooms[1 + Math.floor(R() * (M.rooms.length - 1))]; if (!r) break;
+    const x = r.x + 1 + Math.floor(R() * Math.max(1, r.w - 2)), y = r.y + 1 + Math.floor(R() * Math.max(1, r.h - 2));
+    const horiz = R() < 0.5, cells = [[x, y], horiz ? [x + 1, y] : [x, y + 1]];
+    if (cells.some(([cx, cy]) => cx >= r.x + r.w - 1 || cy >= r.y + r.h - 1 || g[cy * W + cx] !== 0 || keep(cx, cy))) continue;
+    for (const [cx, cy] of cells) g[cy * W + cx] = 2;
+    if (!connected()) { for (const [cx, cy] of cells) g[cy * W + cx] = 0; continue; }
+    M.pits.push(cells); k++;
+  }
+  return M;
+}
+// 当たり判定：壁はすべて、家具は人・敵・カートと、家具より低いお宝をふさぐ
+const tileAt = (x, y) => { const tx = Math.floor(x / T), ty = Math.floor(y / T); return tx < 0 || ty < 0 || tx >= MAP.W || ty >= MAP.H ? 1 : MAP.g[ty * MAP.W + tx]; };
+function blocks(tx, ty, b) {
+  if (tx < 0 || ty < 0 || tx >= MAP.W || ty >= MAP.H) return true;
+  const v = MAP.g[ty * MAP.W + tx];
+  if (v === 1) return true;
+  if (v === 3) return !(b && b.kind === 'item' && b.z >= MAP.fh[ty * MAP.W + tx] - 0.12);
+  return false;
+}
+const groundAt = it => { const tx = Math.floor(it.x / T), ty = Math.floor(it.y / T); if (tx < 0 || ty < 0 || tx >= MAP.W || ty >= MAP.H) return 0; const i = ty * MAP.W + tx; return MAP.g[i] === 3 && it.z >= MAP.fh[i] - 0.12 ? MAP.fh[i] : 0; };
+
+// ================= ホスト：現場の準備 =================
+function freeSpot(r, rad) {
+  for (let k = 0; k < 60; k++) {
+    const x = rnd(r.x * T + rad + 6, (r.x + r.w) * T - rad - 6), y = rnd(r.y * T + rad + 6, (r.y + r.h) * T - rad - 6);
+    if (MAP.desks.some(d => inRect(x, y, d.zone, rad + 24))) continue;
+    const tx = Math.floor(x / T), ty = Math.floor(y / T); let bad = false;
+    for (let oy = -1; oy <= 1 && !bad; oy++) for (let ox = -1; ox <= 1 && !bad; ox++) { const v = MAP.g[(ty + oy) * MAP.W + tx + ox]; if (v === 2 || (!ox && !oy && v !== 0)) bad = true; }
+    if (bad) continue;
+    if (G.items.some(o => Math.hypot(o.x - x, o.y - y) < o.r + rad + 48)) continue; // 間隔をあける
+    return { x, y };
+  }
+  return null;
+}
+const furnSpot = f => { const F = FURN[f.type], back = (TS - F.d) / 2 / SC; return { x: (f.x + 0.5) * T - f.dx * back, y: (f.y + 0.5) * T - f.dy * back, z: F.sup }; };
+function makeItem(d, x, y, base) {
+  const def = ITEMS[d];
+  return { kind: 'item', id: G.nid++, d, n: def.n, r: def.r, m: def.m, f: def.f, big: !!def.big, x, y, z: 0, vz: 0, vx: 0, vy: 0, base, val: base, holder: null, cart: null, lx: 0, ly: 0, suck: null, hitCd: 0, noCart: 0 };
+}
+function makeCart(i, x, y) { return { kind: 'cart', id: -(i + 1), idx: i, x, y, vx: 0, vy: 0, pvx: 0, pvy: 0, r: 24, m: 3, ang: -Math.PI / 2, load: [], holder: null }; }
+// カートの荷台（カートの向きを基準にした半分の長さ・幅）
+const CART_HL = 26, CART_HW = 19, CART_LAYER = 6;
+const itemHeight = d => { const D = ITEMS[d]; if (D.hm == null) D.hm = itemTemplate(d).userData.h * D.r * SC * 0.95; return D.hm; };
+const circleRect = (x, y, r, z) => { const cx = clamp(x, z.x, z.x + z.w), cy = clamp(y, z.y, z.y + z.h); return Math.hypot(x - cx, y - cy) < r; };
+const fullIn = (x, y, r, z) => x - r >= z.x && x + r <= z.x + z.w && y - r >= z.y && y + r <= z.y + z.h;
+function detach(it) { const c = it.cart; if (!c) return; c.load = c.load.filter(o => o !== it); it.cart = null; }
+const secureIn = it => Math.abs(it.lx) + it.r * 0.8 <= CART_HL && Math.abs(it.ly) + it.r * 0.8 <= CART_HW;
+function spill(c, it, ax, ay) {
+  const ca = Math.cos(c.ang), sa = Math.sin(c.ang);
+  detach(it);
+  it.x = c.x + it.lx * ca - it.ly * sa; it.y = c.y + it.lx * sa + it.ly * ca; it.z = 0.55;
+  const ox = it.x - c.x, oy = it.y - c.y, ol = Math.hypot(ox, oy) || 1;
+  it.vx = c.vx - ax * 0.04 + ox / ol * 90; it.vy = c.vy - ay * 0.04 + oy / ol * 90; it.vz = 2;
+  it.noCart = 1; ev('spill', it.x | 0, it.y | 0);
+}
+function spawnMon(type, x, y) {
+  const S = MONS[type];
+  const m = { kind: 'mon', id: G.nid++, type, x, y, vx: 0, vy: 0, r: S.r, m: type === 'brute' ? 8 : type === 'runner' ? 1.5 : 3, hp: S.hp, state: 'wander', face: Math.random() * 6.28, atkCd: 0, stun: 0, losT: 0, sees: null, tgt: -1, goalField: null, goalT: 0, idle: 0, lostT: 0, lx: x, ly: y, rt: 0, growlT: rnd(3, 9) };
+  G.mons.push(m); return m;
+}
+function newPlayer(id, name) {
+  return { kind: 'p', id, name, x: 0, y: 0, z: 0, vz: 0, crouch: false, vx: 0, vy: 0, r: 14, m: 1.6, yaw: -Math.PI / 2, pitch: 0, hp: 100, dead: false, inv: 0, hold: null, sprint: false, noiseT: 0, field: null, lastT: 0, sta: 100, staCd: 0, exh: false, step: 0 };
+}
+function spawnPos(i) {
+  const r0 = MAP.truck.room;
+  return { x: r0.cx + ((i % 3) - 1) * 40, y: r0.cy + T * 0.6 + Math.floor(i / 3) * 40 };
+}
+function hostStartLevel() {
+  const seed = (Math.random() * 2 ** 31) | 0, lv = RUN.level;
+  MAP = genMap(seed, lv);
+  G = { items: [], carts: [], mons: [], sold: 0, quota: quotaOf(lv), death: false, t: 0, spawnT: 3, fieldT: 0, ev: [], broken: 0, kills: 0, nid: 1, paused: false, ended: false };
+  for (const p of PL.values()) if (p.bot) p.bot = { t: 0, sayT: rnd(1, 4), first: true };
+  { const bl = [...PL.values()].filter(q => q.bot); if (bl.length >= 2) bl[0].bot.role = 'cart'; }
+  const r0 = MAP.truck.room, nc = PL.size >= 4 ? 2 : 1;
+  for (let i = 0; i < nc; i++) G.carts.push(makeCart(i, r0.cx - T * 2.4 + i * T * 4.8, r0.cy - T * 0.5));
+  const mult = (1 + 0.18 * (lv - 1)) * (MAP.stage.valMul || 1), rooms = MAP.rooms.slice(1);
+  const pickDef = small => { for (let t = 0; t < 20; t++) { let w = Math.random() * ITEM_W, d = 0; for (let i = 0; i < ITEMS.length; i++) { w -= ITEMS[i].w; if (w <= 0 && ITEMS[i].w) { d = i; break; } } if (!small || !ITEMS[d].big) return d; } return 0; };
+  const price = d => Math.round(rnd(ITEMS[d].v[0], ITEMS[d].v[1]) * mult / 10) * 10;
+  let total = 0;
+  const target = () => total < G.quota * 2.8 || G.items.length < 14 + PL.size * 2;
+  // まず家具の中・上に（1つの家具に1個）
+  const fs = MAP.furn.slice().sort(() => Math.random() - 0.5);
+  for (const f of fs) { if (total >= G.quota * 1.6) break; if (Math.random() < 0.3) continue; const d = pickDef(true), sp = furnSpot(f), it = makeItem(d, sp.x, sp.y, price(d)); it.z = sp.z; G.items.push(it); total += it.base; }
+  // 残りは部屋の床に散らす（1部屋にたまりすぎない）
+  const cnt = new Map();
+  for (let k = 0; target() && k < 160; k++) {
+    const r = pick(rooms), cap = 2 + Math.floor(r.w * r.h / 16);
+    if ((cnt.get(r) || 0) >= cap) continue;
+    const d = pickDef(false), s2 = freeSpot(r, ITEMS[d].r);
+    if (!s2) continue;
+    const it = makeItem(d, s2.x, s2.y, price(d)); G.items.push(it); total += it.base; cnt.set(r, (cnt.get(r) || 0) + 1);
+  }
+  const types = ['wander']; if (lv >= 2) types.push('runner'); if (lv >= 3) types.push('brute');
+  const far = MAP.others.filter(r => r.dist > 14);
+  const humans = [...PL.values()].filter(p => !p.bot).length, bots = PL.size - humans;
+  const nMon = Math.min(1 + lv + Math.floor((humans - 1) / 2) + Math.floor(bots / 3) + (MAP.stage.monBonus || 0), 12);
+  for (let k = 0; k < nMon; k++) {
+    const r = pick(far.length ? far : MAP.others); if (!r) break;
+    let mx = 0, my = 0; for (let t = 0; t < 30; t++) { mx = (r.x + rnd(1, r.w - 1)) * T; my = (r.y + rnd(1, r.h - 1)) * T; if (tileAt(mx, my) === 0) break; }
+    spawnMon(k === 0 ? 'wander' : pick(types), mx, my);
+  }
+  let i = 0;
+  for (const p of PL.values()) {
+    const s = spawnPos(i++);
+    Object.assign(p, { ammo: RUN.gun ? 5 : 0, shotCd: 0, x: s.x, y: s.y, vx: 0, vy: 0, hp: maxHp(), dead: false, hold: null, inv: 0, yaw: -Math.PI / 2, pitch: 0, sta: maxSta(), exh: false, field: null });
+  }
+  ME = PL.get(myId);
+  enterLevel();
+  for (const [, c] of NET.conns) sendStart(c);
+  ev('toast', `現場 Lv.${lv}「${MAP.stage.n}」　ノルマ ${yen(G.quota)}`, '#fff', 4, -1);
+  { const g0 = G; setTimeout(() => { if (G === g0 && !G.ended) ev('toast', MAP.stage.d, '#ffd84d', 3.5, -1); }, 4200); }
+}
+function sendStart(c) {
+  const p = PL.get(c.pid); if (!p) return;
+  try { c.conn.send({ t: 'start', seed: MAP.seed, lv: MAP.lv, you: p.id, sx: p.x, sy: p.y, run: RUN, roster: ROSTER }); } catch (e) {}
+}
+function enterLevel() {
+  V = { items: new Map(), mons: new Map(), players: new Map(), carts: [] };
+  FX.chat = []; FX.says = {}; FX.texts = []; FX.parts = []; FX.msg = null; FX.hurt = FX.flash = FX.shake = 0; renderChat();
+  buildWorld(MAP);
+  playing = true; shownEnd = false;
+  showScr(null);
+  lockMouse();
+}
+
+// ================= ホスト：ゲーム処理 =================
+function ev(...a) { if (!G) return; G.ev.push(a); handleEvent(a); }
+function toastTo(p, text, col = '#fff', t = 2) { ev('toast', text, col, t, p ? p.id : -1); }
+function alive() { const a = []; for (const p of PL.values()) if (!p.dead) a.push(p); return a; }
+function makeNoise(x, y, rad) {
+  for (const m of G.mons) {
+    if (m.state === 'chase' || m.state === 'retreat') continue;
+    if (Math.hypot(m.x - x, m.y - y) > rad) continue;
+    if (m.state === 'investigate' && Math.hypot(m.lx - x, m.ly - y) < T * 3) continue;
+    setGoal(m, x, y); m.state = 'investigate'; m.lx = x; m.ly = y;
+  }
+}
+function setGoal(m, x, y) { m.goalField = bfs(MAP, Math.floor(x / T), Math.floor(y / T)); m.goalT = 14; m.idle = rnd(1.5, 3); }
+function wanderGoal(m) { const r = pick(MAP.rooms.slice(1)) || MAP.rooms[0]; setGoal(m, (r.x + rnd(1, r.w - 1)) * T, (r.y + rnd(1, r.h - 1)) * T); m.goalT = 25; }
+function flowDir(m, field) {
+  if (!field) return null;
+  const W = MAP.W, tx = Math.floor(m.x / T), ty = Math.floor(m.y / T);
+  if (tx < 0 || ty < 0 || tx >= W || ty >= MAP.H) return null;
+  const cur = field[ty * W + tx];
+  if (cur <= 0) return null;
+  let best = cur, bx = tx, by = ty;
+  for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+    if (!dx && !dy) continue;
+    const nx = tx + dx, ny = ty + dy;
+    if (nx < 0 || ny < 0 || nx >= W || ny >= MAP.H) continue;
+    const v = field[ny * W + nx];
+    if (v < 0 || v >= best) continue;
+    if (dx && dy && (MAP.g[ty * W + nx] || MAP.g[ny * W + tx])) continue;
+    best = v; bx = nx; by = ny;
+  }
+  if (bx === tx && by === ty) return null;
+  return { x: (bx + 0.5) * T, y: (by + 0.5) * T };
+}
+// カートの持ち手の位置（進行方向の反対側）
+const HANDLE_OFF = 36;
+const handleOf = c => ({ x: c.x - Math.cos(c.ang) * HANDLE_OFF, y: c.y - Math.sin(c.ang) * HANDLE_OFF });
+function hostAct(p) {
+  if (!G || p.dead || G.ended) return;
+  for (const d of MAP.desks) if (Math.hypot(p.x - d.btn.x, p.y - d.btn.y) < 64) return sell(d, p);
+  if (inBus(p) && (G.sold >= G.quota || Math.hypot(p.x - MAP.truck.mon.x, p.y - MAP.truck.mon.y) < 72)) {
+    if (G.sold < G.quota) { ev('deny', p.id); return toastTo(p, 'ノルマ未達成：あと ' + yen(G.quota - G.sold), '#ff8a80', 2.5); }
+    const al = alive(), r0 = MAP.truck.room, z = { x: r0.x * T, y: r0.y * T, w: r0.w * T, h: r0.h * T };
+    const inside = al.filter(q => inRect(q.x, q.y, z)).length;
+    if (inside < al.length) { ev('deny', p.id); return toastTo(p, `全員バスに乗って！（${inside}/${al.length}）`, '#ffb74d', 2.5); }
+    return levelClear();
+  }
+  if (p.hold) return;
+  for (const c of G.carts) {
+    if (Math.hypot(p.x - c.x, p.y - c.y) > 75) continue;
+    for (let i = c.load.length - 1; i >= 0; i--) {
+      const it = c.load[i];
+      detach(it); it.z = 0.5;
+      const fx = Math.cos(p.yaw), fy = Math.sin(p.yaw);
+      it.x = p.x + fx * (p.r + it.r + 10); it.y = p.y + fy * (p.r + it.r + 10); it.vx = it.vy = 0;
+      if (solidAt(it.x, it.y)) { it.x = p.x; it.y = p.y; }
+      it.noCart = 0.8; hostGrabObj(p, it);
+      return;
+    }
+  }
+}
+function sell(d, p) {
+  if (d.anim != null) { ev('deny', p.id); return toastTo(p, '納品中…', '#ffb74d', 1.2); }
+  const any = G.items.some(it => !it.holder && !it.suck && (it.cart ? circleRect(it.cart.x, it.cart.y, it.cart.r, d.zone) : circleRect(it.x, it.y, it.r, d.zone)));
+  if (!any) { ev('deny', p.id); return toastTo(p, '納品エリアにお宝がない', '#ff8a80'); }
+  d.anim = 0; d.by = p.id;
+  makeNoise(d.btn.x, d.btn.y, 420);
+  ev('deliver', MAP.desks.indexOf(d));
+}
+// 箱が降りきった瞬間：エリア内は吸い取り、はみ出た物は壊れる
+function deskActivate(d) {
+  let n = 0, crushed = 0;
+  for (const it of [...G.items]) {
+    if (it.holder || it.suck || it.z > 1.3) continue;
+    const c = it.cart, x = c ? c.x : it.x, y = c ? c.y : it.y, r = c ? c.r : it.r;
+    if (fullIn(x, y, r, d.zone)) { detach(it); it.x = clamp(it.x, d.zone.x + it.r, d.zone.x + d.zone.w - it.r); it.y = clamp(it.y, d.zone.y + it.r, d.zone.y + d.zone.h - it.r); it.suck = d; it.vx = it.vy = it.vz = 0; n++; }
+    else if (circleRect(x, y, r, d.zone)) { if (it.d === HEAD) continue; breakItem(it, true); crushed++; }
+  }
+  ev('field', MAP.desks.indexOf(d), n, crushed);
+}
+function deskFinish(d) {
+  const list = G.items.filter(it => it.suck === d);
+  G.items = G.items.filter(it => it.suck !== d);
+  if (!list.length) return;
+  for (const it of list) if (it.d === HEAD) { // 頭を納品 → HP1で復活
+    const q = PL.get(it.owner); if (!q || !q.dead) continue;
+    let rx = d.btn.x, ry = d.btn.y + T; if (tileAt(rx, ry) !== 0) { rx = d.btn.x; ry = d.btn.y - T; } if (tileAt(rx, ry) !== 0) { rx = d.btn.x; ry = d.btn.y; }
+    revive(q, rx, ry);
+  }
+  let sum = 0; for (const it of list) sum += Math.round(it.val);
+  G.sold += sum; RUN.money += sum; RUN.total += sum;
+  ev('sell', MAP.desks.indexOf(d), sum, list.length);
+  if (!G.death && G.sold >= G.quota) { G.death = true; G.spawnT = 2.5; for (const m of G.mons) m.state = 'chase'; ev('death'); }
+}
+function hostHeal(p) {
+  if (!G || p.dead) return;
+  if (RUN.inv.heal <= 0) { ev('deny', p.id); return toastTo(p, '回復パックがない', '#ff8a80', 1.5); }
+  if (p.hp >= maxHp()) return toastTo(p, 'HPは満タン', '#fff', 1.2);
+  RUN.inv.heal--; p.hp = Math.min(maxHp(), p.hp + 50); ev('heal', p.id);
+}
+function hostFlash(p) {
+  if (!G || p.dead) return;
+  if (RUN.inv.flash <= 0) { ev('deny', p.id); return toastTo(p, '閃光弾がない', '#ff8a80', 1.5); }
+  RUN.inv.flash--;
+  let n = 0;
+  for (const m of G.mons) if (Math.hypot(m.x - p.x, m.y - p.y) < 340) { m.stun = 4.5; n++; }
+  ev('flash', p.x, p.y); toastTo(p, n ? n + '体のモンスターが気絶！' : '閃光！', '#fff', 2);
+}
+function hostShoot(p, yaw) {
+  if (!G || p.dead || G.ended) return;
+  if (!RUN.gun) { ev('deny', p.id); return toastTo(p, '拳銃を持っていない（ショップで買える）', '#ff8a80', 1.8); }
+  if ((p.shotCd || 0) > G.t) return;
+  if (!(p.ammo > 0)) { ev('deny', p.id); return toastTo(p, '弾切れ…（次の現場で5発に戻る）', '#ff8a80', 1.8); }
+  p.ammo--; p.shotCd = G.t + 0.35;
+  const a = yaw != null ? yaw : p.yaw, fx = Math.cos(a), fy = Math.sin(a);
+  let ex = p.x, ey = p.y, hit = null;
+  for (let d = 10; d < 900; d += 6) {
+    ex = p.x + fx * d; ey = p.y + fy * d;
+    if (solidAt(ex, ey)) break;
+    hit = G.mons.find(m => Math.hypot(m.x - ex, m.y - ey) < m.r + 5);
+    if (hit) break;
+  }
+  ev('shot', p.id, p.x | 0, p.y | 0, ex | 0, ey | 0, hit ? 1 : 0);
+  makeNoise(p.x, p.y, 650);
+  if (hit) { hurtMon(hit, 50); hit.vx += fx * 220; hit.vy += fy * 220; }
+}
+function hostGrabObj(p, o) {
+  if (p.hold || p.dead || o.suck) return false;
+  if (o.holder) { // 誰かが持っている物は一緒に持つ（力が合わさる）
+    if (o.holder === p || (o.helpers || []).includes(p)) return false;
+    (o.helpers = o.helpers || []).push(p);
+    p.hold = o; p.pullT = 1.5; p.ptx = p.pty = p.ptz = null; p.hvx = p.hvy = p.hvz = 0;
+    ev('grab', p.id); ev('toast', p.name + ' も一緒に持った！（' + (1 + o.helpers.length) + '人）', '#9fd3ff', 1.5, -1); return true;
+  }
+  if (o.cart) { const c = o.cart, ca = Math.cos(c.ang), sa = Math.sin(c.ang); detach(o); o.x = c.x + o.lx * ca - o.ly * sa; o.y = c.y + o.lx * sa + o.ly * ca; o.z = 0.5; o.vx = c.vx; o.vy = c.vy; o.noCart = 0.6; }
+  p.hold = o; o.holder = p; p.pullT = 1.5; p.ptx = p.pty = p.ptz = null; p.hvx = p.hvy = p.hvz = 0;
+  ev('grab', p.id); return true;
+}
+function hostGrab(p, id) {
+  if (!G || p.hold || p.dead) return;
+  let o;
+  if (id >= MON_ID) {
+    o = G.mons.find(m => m.id === id - MON_ID); if (!o) return;
+    const S = MONS[o.type];
+    if (!o.holder && (!S.lift || RUN.up.str < S.lift)) { ev('deny', p.id); return toastTo(p, '重すぎて持ち上げられない…', '#ff8a80', 2); }
+  } else o = id < 0 ? G.carts[-id - 1] : G.items.find(i => i.id === id);
+  if (!o) return;
+  const pt = o.kind === 'cart' ? handleOf(o) : o;
+  if (Math.hypot(pt.x - p.x, pt.y - p.y) > 150 + reachExtra() || !los(p.x, p.y, pt.x, pt.y)) return;
+  hostGrabObj(p, o);
+}
+function hostRelease(p) {
+  const o = p.hold; if (!o) return;
+  p.hold = null; ev('drop', p.id);
+  if (o.holder !== p) { o.helpers = (o.helpers || []).filter(q => q !== p); return; } // 一緒に持っていた人が離しただけ
+  if (o.helpers && o.helpers.length) { o.holder = o.helpers.shift(); return; } // 残った人が引き継ぐ
+  o.holder = null;
+  if (o.kind !== 'cart') { // 振りながら離すと投げる。持ち上げパワーが高いほど速く・高く飛ぶ
+    const lv = strLv(), heavy = Math.sqrt(Math.max(1, o.m / strength()));
+    const hs = Math.hypot(p.hvx || 0, p.hvy || 0), is = Math.hypot(o.vx, o.vy), ps = Math.hypot(p.vx, p.vy);
+    if (hs - ps > 90 || is - ps > 150) {
+      const sp = Math.max(hs, is) * (1 + 0.08 * lv) / heavy, ux = hs >= is ? p.hvx / hs : o.vx / is, uy = hs >= is ? p.hvy / hs : o.vy / is;
+      o.vx = ux * sp; o.vy = uy * sp;
+    }
+    if (o.kind === 'item' && ((p.hvz || 0) > 0.8 || o.vz > 0.8)) o.vz = Math.max(o.vz, p.hvz || 0) * (1 + 0.07 * lv) / heavy;
+  }
+  if (o.kind === 'mon') { o.thrownT = 1.2; o.stun = Math.max(o.stun, 0.6); o.struggle = 0; }
+}
+function hurtPlayer(p, dmg, src) {
+  if (p.inv > 0 || p.dead) return;
+  p.hp -= dmg; p.inv = 0.8;
+  const dx = p.x - src.x, dy = p.y - src.y, d = Math.hypot(dx, dy) || 1;
+  ev('hurt', p.id, dx / d * 480, dy / d * 480);
+  if (p.bot) { p.vx += dx / d * 300; p.vy += dy / d * 300; if (p.hp > dmg && Math.random() < 0.5) say(p, 'hurt'); }
+  if (p.hold && Math.random() < 0.6) hostRelease(p);
+  if (p.hp <= 0) killPlayer(p, 'mon');
+}
+function killPlayer(p, cause) {
+  if (p.dead) return;
+  p.hp = 0; p.dead = true; hostRelease(p);
+  ev('pdie', p.id, p.x, p.y, cause === 'pit' ? 1 : 0);
+  if (p.bot) say(p, 'die');
+  ev('toast', p.name + (cause === 'pit' ? ' が穴に落ちた…' : ' が死亡した…') + '　頭を納品すると復活！', '#ff5a4d', 3.5, -1);
+  spawnHead(p, cause);
+  if (!alive().length) { G.ended = true; const g0 = G; setTimeout(() => { if (G === g0) gameOver(); }, 1800); }
+}
+// 頭が飛ぶ（穴に落ちたときは近くの床に飛び出す）
+function spawnHead(p, cause) {
+  let x = p.x, y = p.y;
+  if (cause === 'pit' || tileAt(x, y) !== 0) {
+    let best = null, bd = 1e9; const tx = Math.floor(x / T), ty = Math.floor(y / T);
+    for (let oy = -3; oy <= 3; oy++) for (let ox = -3; ox <= 3; ox++) { const v = MAP.g[(ty + oy) * MAP.W + tx + ox]; if (v !== 0) continue; const d = Math.hypot(ox, oy); if (d < bd) { bd = d; best = [tx + ox, ty + oy]; } }
+    if (best) { x = (best[0] + 0.5) * T; y = (best[1] + 0.5) * T; } else { x = MAP.truck.room.cx; y = MAP.truck.room.cy; }
+  }
+  const h = makeItem(HEAD, x, y, 0); h.owner = p.id; h.z = 1.4; h.vz = 5;
+  const a = Math.random() * 6.28; h.vx = Math.cos(a) * 140; h.vy = Math.sin(a) * 140; h.noCart = 0.5;
+  G.items.push(h);
+}
+function revive(q, x, y) {
+  q.dead = false; q.hp = 1; q.inv = 2; q.x = x; q.y = y; q.vx = q.vy = 0; q.hold = null; q.z = 0;
+  if (q.bot) q.bot = Object.assign({ t: 0, sayT: 3 }, { role: q.bot.role });
+  ev('revive', q.id, x | 0, y | 0);
+  ev('toast', q.name + ' が復活した！（HP1）', '#7dffa0', 3, -1);
+}
+function hitItem(it, imp) {
+  if (it.cart || it.suck || imp < 150 || it.hitCd > 0) return;
+  const loss = Math.round(it.base * it.f * (imp - 150) / 650);
+  if (loss <= 0) return;
+  it.hitCd = 0.12; it.val -= loss;
+  ev('crash', it.x | 0, it.y | 0, loss);
+  if (imp > 330) makeNoise(it.x, it.y, 340);
+  if (it.val <= it.base * 0.1) breakItem(it);
+}
+function breakItem(it, crushed) {
+  for (const q of [...(it.helpers || [])]) hostRelease(q);
+  if (it.holder) hostRelease(it.holder);
+  detach(it);
+  G.items = G.items.filter(o => o !== it); G.broken++;
+  makeNoise(it.x, it.y, 520);
+  ev('break', it.x | 0, it.y | 0, it.n, crushed ? 1 : 0);
+}
+function hurtMon(m, amt) {
+  amt = Math.round(amt); if (amt <= 0) return;
+  m.hp -= amt; m.stun = Math.max(m.stun, 0.6);
+  ev('monhit', m.x | 0, m.y | 0, amt);
+  if (m.hp <= 0) {
+    G.mons = G.mons.filter(o => o !== m); G.kills++;
+    const O = MONS[m.type].orb, v = Math.round(rnd(O[0], O[1]) * (1 + 0.18 * (MAP.lv - 1)) / 10) * 10;
+    { const o = makeItem(ORB, m.x, m.y, v); o.z = 1; G.items.push(o); }
+    ev('mondie', m.x | 0, m.y | 0, v);
+  } else if (m.state !== 'retreat') m.state = 'chase';
+}
+
+// ---- 物理 ----
+function collideTiles(b) {
+  let maxImp = 0;
+  const r = b.r, x0 = Math.floor((b.x - r) / T), x1 = Math.floor((b.x + r) / T), y0 = Math.floor((b.y - r) / T), y1 = Math.floor((b.y + r) / T);
+  for (let ty = y0; ty <= y1; ty++) for (let tx = x0; tx <= x1; tx++) {
+    if (!blocks(tx, ty, b)) continue;
+    const cx = clamp(b.x, tx * T, tx * T + T), cy = clamp(b.y, ty * T, ty * T + T);
+    const dx = b.x - cx, dy = b.y - cy, d2 = dx * dx + dy * dy;
+    if (d2 >= r * r) continue;
+    const d = Math.sqrt(d2); let nx, ny;
+    if (d < 0.001) {
+      const ox = b.x - (tx + 0.5) * T, oy = b.y - (ty + 0.5) * T;
+      if (Math.abs(ox) > Math.abs(oy)) { nx = Math.sign(ox) || 1; ny = 0; } else { nx = 0; ny = Math.sign(oy) || 1; }
+      const pen = nx ? (nx > 0 ? (tx + 1) * T - b.x : b.x - tx * T) + r : (ny > 0 ? (ty + 1) * T - b.y : b.y - ty * T) + r;
+      b.x += nx * pen; b.y += ny * pen;
+    } else { nx = dx / d; ny = dy / d; b.x += nx * (r - d); b.y += ny * (r - d); }
+    const vn = b.vx * nx + b.vy * ny;
+    if (vn < 0) { const e = b.kind === 'item' ? 0.35 : 0.1; b.vx -= (1 + e) * vn * nx; b.vy -= (1 + e) * vn * ny; if (-vn > maxImp) maxImp = -vn; }
+  }
+  return maxImp;
+}
+function collidePair(a, b) {
+  const dx = b.x - a.x, dy = b.y - a.y, rr = a.r + b.r, d2 = dx * dx + dy * dy;
+  if (d2 >= rr * rr || d2 === 0) return 0;
+  const d = Math.sqrt(d2), nx = dx / d, ny = dy / d, pen = rr - d;
+  const ia = 1 / a.m, ib = 1 / b.m, tot = ia + ib;
+  a.x -= nx * pen * ia / tot; a.y -= ny * pen * ia / tot; b.x += nx * pen * ib / tot; b.y += ny * pen * ib / tot;
+  const rv = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
+  if (rv >= 0) return 0;
+  const j = -1.3 * rv / tot;
+  a.vx -= j * ia * nx; a.vy -= j * ia * ny; b.vx += j * ib * nx; b.vy += j * ib * ny;
+  return -rv;
+}
+function kinPush(k, b) {
+  const dx = b.x - k.x, dy = b.y - k.y, rr = k.r + b.r, d2 = dx * dx + dy * dy;
+  if (d2 >= rr * rr || d2 === 0) return;
+  const d = Math.sqrt(d2), nx = dx / d, ny = dy / d;
+  b.x += nx * (rr - d); b.y += ny * (rr - d);
+  const rv = (b.vx - k.vx) * nx + (b.vy - k.vy) * ny;
+  if (rv < 0) { b.vx -= rv * nx; b.vy -= rv * ny; }
+}
+function pairEvent(a, b, imp) {
+  if (a.kind > b.kind) { const t = a; a = b; b = t; } // cart < item < mon
+  if (a.kind === 'item' && b.kind === 'item') { hitItem(a, imp); hitItem(b, imp); }
+  else if (a.kind === 'item' && b.kind === 'mon') {
+    const slam = a.z > 0.3 && a.vz < -1.5 ? -a.vz * 60 : 0, hit = Math.max(imp, slam);
+    if (hit > 140 && !b.holder) { hurtMon(b, (hit - 110) * a.m * 0.17); hitItem(a, hit * 0.7); a.vz = Math.abs(a.vz) * 0.3; }
+    if (b.type === 'brute' && b.state === 'chase' && !a.holder) { const dx = a.x - b.x, dy = a.y - b.y, d = Math.hypot(dx, dy) || 1; a.vx += dx / d * 420; a.vy += dy / d * 420; }
+  } else if (a.kind === 'cart' && b.kind === 'mon') { // カートで轢く：敵に10ダメージ
+    if (imp > 90 && !b.holder && !(b.cartCd > G.t)) { b.cartCd = G.t + 0.7; hurtMon(b, 10); const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1; b.vx += dx / d * 260; b.vy += dy / d * 260; }
+  }
+}
+function physics(dt) {
+  for (const p of PL.values()) {
+    const o = p.hold; if (!o || p.dead) continue;
+    const fx = Math.cos(p.yaw), fy = Math.sin(p.yaw);
+    let tx, ty;
+    if (o.kind === 'cart') { // 持ち手を持って押す（AIは後ろに引いて歩く）：持ち手が自分の手元に来るように
+      const hd = p.r + 12 + HANDLE_OFF, pull = p.bot ? -1 : 1;
+      tx = p.x + fx * hd * pull; ty = p.y + fy * hd * pull;
+      if (o.holder === p) o.ang += angDiff(p.bot ? p.yaw + Math.PI : p.yaw, o.ang) * Math.min(1, dt * (p.bot ? 4 : 8));
+    } else { const hd = p.r + o.r + 16 + clamp(p.holdD || 0, -10, 70) + (o.kind === 'mon' ? 6 : 0); tx = p.x + fx * hd; ty = p.y + fy * hd; }
+    if (p.ptx != null) { p.hvx += ((tx - p.ptx) / dt - p.hvx) * 0.35; p.hvy += ((ty - p.pty) / dt - p.hvy) * 0.35; }
+    p.ptx = tx; p.pty = ty;
+    const k = clamp(110 * strength() / o.m, 10, 60 + 12 * strLv()), damp = 2 * Math.sqrt(k) * 0.85;
+    if (o.kind !== 'cart') { // 遠心力：素早く振り向くほど外へ引っ張られる（回しすぎると手から飛んでいく）
+      const w = p.yawRate || 0;
+      if (Math.abs(w) > 0.8) { const ac = Math.min(w * w, 400); o.vx += (o.x - p.x) * ac * dt; o.vy += (o.y - p.y) * ac * dt; }
+    }
+    let ax = (tx - o.x) * k - (o.vx - p.vx) * damp, ay = (ty - o.y) * k - (o.vy - p.vy) * damp;
+    const amax = 3000 * strength() / o.m, al = Math.hypot(ax, ay);
+    if (al > amax) { ax *= amax / al; ay *= amax / al; }
+    o.vx += ax * dt; o.vy += ay * dt;
+    const sp = Math.hypot(o.vx, o.vy), cap = throwCap(); if (sp > cap) { o.vx *= cap / sp; o.vy *= cap / sp; }
+    if (o.kind === 'item') { // 高さ：視点の上下に合わせて持ち上げる
+      const nh = 1 + (o.helpers ? o.helpers.length : 0);
+      const sag = Math.max(0, o.m / nh - strength() * 1.2) * 0.25 - (nh - 1) * 0.25; // 力が足りないと重い物は垂れ下がる（みんなで持つと持ち上がる）
+      const zt = Math.max(0, 1.0 + clamp(p.pitch, -0.8, 1.2) * 0.8 + (p.z || 0) - (p.crouch ? 0.45 : 0) - itemHeight(o.d) / 2 - sag);
+      let az = (zt - o.z) * k - o.vz * damp; az = clamp(az, -amax * SC, amax * SC);
+      const vc = 6 + 0.6 * strLv(); o.vz = clamp(o.vz + az * dt, -vc, vc);
+      if (p.ptz != null) p.hvz += ((zt - p.ptz) / dt - p.hvz) * 0.35;
+      p.ptz = zt;
+    }
+  }
+  for (const it of G.items) { // 高さの移動と重力
+    if (it.cart || it.suck) continue;
+    const gz = groundAt(it);
+    if (!it.holder && (it.z > gz || it.vz > 0)) it.vz -= 9.8 * dt;
+    it.z += it.vz * dt;
+    if (it.z <= gz) {
+      if (it.vz < 0) { const imp = -it.vz; if (!it.holder) hitItem(it, imp * 48); it.vz = imp > 2.2 && !it.holder ? imp * 0.3 : 0; }
+      it.z = gz;
+    }
+    const top = WALL_H - itemHeight(it.d);
+    if (it.z > top) { it.z = top; if (it.vz > 0) { if (!it.holder) hitItem(it, it.vz * 48); it.vz = -it.vz * 0.3; } }
+  }
+  const bodies = [...G.carts];
+  for (const it of G.items) if (!it.cart && !it.suck) bodies.push(it);
+  for (const m of G.mons) bodies.push(m);
+  for (const b of bodies) {
+    const sp = Math.hypot(b.vx, b.vy); if (sp > 1200) { b.vx *= 1200 / sp; b.vy *= 1200 / sp; }
+    b.x += b.vx * dt; b.y += b.vy * dt;
+  }
+  for (const b of bodies) { const imp = collideTiles(b); if (b.kind === 'item' && imp) hitItem(b, imp); else if (b.kind === 'mon' && imp > 200 && (b.thrownT > 0 || b.holder)) { hurtMon(b, (imp - 160) * 0.22); b.thrownT = 0; } }
+  for (let i = 0; i < bodies.length; i++) for (let j = i + 1; j < bodies.length; j++) {
+    const a = bodies[i], b = bodies[j];
+    if ((a.kind === 'cart' && b.kind === 'item') || (b.kind === 'cart' && a.kind === 'item')) continue;
+    if (a.kind === 'item' && b.kind === 'item' && Math.abs(a.z - b.z) > 0.8) continue; // 空中ですれ違う
+    if ((a.kind === 'item' && a.z > 1.8 && b.kind !== 'mon') || (b.kind === 'item' && b.z > 1.8 && a.kind !== 'mon')) continue; // 頭上を越える
+    if (a.kind === 'mon' && b.kind === 'mon') { collidePair(a, b); continue; }
+    const imp = collidePair(a, b);
+    if (imp) pairEvent(a, b, imp);
+  }
+  for (const p of PL.values()) {
+    if (p.dead) continue;
+    for (const b of bodies) if (b !== p.hold && !(b.kind === 'item' && ((p.z || 0) > 0.3 || p.bot || b.z > 1.0)) && !(p.bot && b.kind === 'cart')) kinPush(p, b);
+  }
+  for (const b of bodies) collideTiles(b);
+}
+function say(p, kind) {
+  const d = botDef(p.botKey); if (!d || !d.lines[kind]) return;
+  p.bot.sayT = rnd(6, 12);
+  ev('say', p.id, pick(d.lines[kind]));
+}
+function botGoal(p, x, y) {
+  const B = p.bot, tx = Math.floor(x / T), ty = Math.floor(y / T);
+  if (B.gx !== tx || B.gy !== ty || B.fT <= 0) { B.gx = tx; B.gy = ty; B.field = bfs(MAP, tx, ty); B.fT = 1.5; }
+  return flowDir(p, B.field) || { x, y };
+}
+const deskOfItem = it => MAP.desks.find(d => inRect(it.x, it.y, d.zone));
+function botThink(p, dt) {
+  const B = p.bot;
+  B.fT = (B.fT || 0) - dt; B.sayT -= dt; B.waitT = (B.waitT || 0) - dt; B.actT = (B.actT || 0) - dt;
+  if (B.first) { B.first = false; const g0 = G; if (Math.random() < 0.7) setTimeout(() => { if (G === g0 && !p.dead) say(p, 'start'); }, rnd(500, 3000)); }
+  // 危険の確認
+  let threat = null, td = 1e9;
+  for (const m of G.mons) {
+    if (m.stun > 0) continue;
+    const d = Math.hypot(m.x - p.x, m.y - p.y);
+    if (d < (m.state === 'chase' && m.tgt === p.id ? 340 : m.state === 'chase' ? 240 : 150) && d < td && los(m.x, m.y, p.x, p.y)) { threat = m; td = d; }
+  }
+  let goal = null, spd = 125, mode = 'go';
+  B.scared = (B.scared || 0) - dt;
+  if (threat) B.scared = 3; else if (B.scared > 0 && B.lastThreat && G.mons.includes(B.lastThreat)) threat = B.lastThreat;
+  if (threat) B.lastThreat = threat;
+  if (threat && !G.death) {
+    if (!B.fled) { B.fled = true; say(p, 'mon'); }
+    if (p.hold && td < 170) hostRelease(p);
+    mode = 'flee'; spd = 190;
+  } else if (B.fled && !threat) B.fled = false;
+  const danger = (x, y) => G.mons.some(m => m.stun <= 0 && Math.hypot(m.x - x, m.y - y) < (m.state === 'chase' ? 320 : 200));
+  if (!B.role && !G.death) { const bl = [...PL.values()].filter(q => q.bot && !q.dead); if (bl.length >= 2 && bl[0] === p && !bl.some(q => q.bot.role === 'cart')) B.role = 'cart'; }
+  const freeLeft = () => G.items.some(o => !o.holder && !o.cart && !o.suck && !deskOfItem(o));
+  if (G.death) {
+    if (!B.deathSaid) { B.deathSaid = true; const g0 = G; setTimeout(() => { if (G === g0 && !p.dead) say(p, 'death'); }, rnd(300, 1500)); }
+    if (p.hold) hostRelease(p);
+    goal = { x: MAP.truck.mon.x, y: MAP.truck.mon.y + 40 }; spd = 190;
+    if (Math.hypot(p.x - MAP.truck.mon.x, p.y - MAP.truck.mon.y) < 70 && B.actT <= 0) { B.actT = 1; hostAct(p); }
+  } else if (mode !== 'flee') {
+    const dc = G.carts.find(c => c.holder && c.holder.bot && !c.delivering);
+    if (p.hold && p.hold.kind === 'item' && dc && B.role !== 'cart' && Math.hypot(dc.x - p.x, dc.y - p.y) < Math.min(...MAP.desks.map(d => Math.hypot(d.btn.x - p.x, d.btn.y - p.y))) && !p.hold.big) {
+      const it = p.hold, ux = dc.x - p.x, uy = dc.y - p.y, ul = Math.hypot(ux, uy) || 1, hd = p.r + it.r + 16;
+      goal = { x: dc.x - ux / ul * hd, y: dc.y - uy / ul * hd }; spd = 100; // 持っている物がカートの真ん中に来る位置
+      if (ul < hd + 40) p.yaw = Math.atan2(uy, ux);
+      if (Math.hypot(it.x - dc.x, it.y - dc.y) < 9) { hostRelease(p); B.item = null; B.waitT = 0.6; }
+    } else if (p.hold && p.hold.kind === 'item') {
+      const it = p.hold;
+      let best = null, bd = 1e9;
+      for (const d of MAP.desks) { const dd = Math.hypot(d.zone.x + d.zone.w / 2 - p.x, d.zone.y + d.zone.h / 2 - p.y); if (dd < bd) { bd = dd; best = d; } }
+      if (best) {
+        goal = { x: best.zone.x + best.zone.w / 2, y: best.zone.y + best.zone.h / 2 }; spd = 100;
+        if (fullIn(it.x, it.y, it.r + 6, best.zone)) { hostRelease(p); B.sellDesk = best; B.sellT = 6; B.item = null; }
+      }
+    } else if (p.hold && !(B.role === 'cart' && p.hold.kind === 'cart')) hostRelease(p);
+    if (!p.hold && !B.sellDesk) { // 置きっぱなしのお宝があれば納品ボタンを押しに行く
+      const pend = MAP.desks.find(d => d.anim == null && Math.hypot(d.btn.x - p.x, d.btn.y - p.y) < 500 && G.items.some(it => !it.holder && !it.suck && !it.cart && fullIn(it.x, it.y, it.r, d.zone)));
+      if (pend) { B.sellDesk = pend; B.sellT = 8; }
+    }
+    if (p.hold && p.hold.kind !== 'cart') { }
+    else if (p.hold && p.hold.kind === 'cart') { // カート係：仲間の近くへ運び、たまったら納品エリアへ
+      const c = p.hold; spd = 95; B.ctgt = null;
+      if (!c.delivering && (c.load.length >= 4 || (c.load.length > 0 && !freeLeft()))) c.delivering = true;
+      if (c.delivering) {
+        let best = null, bd = 1e9; for (const d of MAP.desks) { const dd = Math.hypot(d.btn.x - p.x, d.btn.y - p.y); if (dd < bd && d.anim == null) { bd = dd; best = d; } }
+        if (best) {
+          const zx = best.zone.x + best.zone.w / 2, zy = best.zone.y + best.zone.h / 2, dcz = Math.hypot(zx - c.x, zy - c.y);
+          if (dcz < 220) { const ux = (zx - c.x) / (dcz || 1), uy = (zy - c.y) / (dcz || 1); B.ctgt = { x: zx + ux * 70, y: zy + uy * 70 }; if (solidAt(B.ctgt.x, B.ctgt.y)) B.ctgt = { x: zx, y: zy }; }
+          else B.ctgt = { x: zx, y: zy };
+          if (fullIn(c.x, c.y, c.r + 4, best.zone)) { hostRelease(p); c.delivering = false; B.sellDesk = best; B.sellT = 8; B.ctgt = null; }
+        }
+      } else {
+        let tg = null, bd = 1e9;
+        for (const q of PL.values()) { if (q === p || q.dead || !q.bot) continue; const d = Math.hypot(q.x - p.x, q.y - p.y); if (d < bd) { bd = d; tg = q; } }
+        if (!tg) for (const o of G.items) { if (o.holder || o.cart || o.suck || deskOfItem(o)) continue; const d = Math.hypot(o.x - p.x, o.y - p.y); if (d < bd) { bd = d; tg = o; } }
+        B.ctgt = tg && Math.hypot(tg.x - c.x, tg.y - c.y) > 130 ? { x: tg.x, y: tg.y } : null;
+      }
+    }
+    else if (B.sellDesk) {
+      goal = B.sellDesk.btn; B.sellT -= dt;
+      if (Math.hypot(p.x - goal.x, p.y - goal.y) < 50) { const dk = B.sellDesk, was = dk.anim; if (was == null) { hostAct(p); if (dk.anim != null) say(p, 'sell'); B.sellDesk = null; } }
+      if (B.sellT <= 0) B.sellDesk = null;
+    } else if (B.waitT > 0) { // 物を置いた直後は少し待つ
+    } else if (B.role === 'cart' && G.carts.some(c => !c.holder)) { // カート係：持ち手をつかみに行く
+      let c = null, bd = 1e9; for (const o of G.carts) { if (o.holder) continue; const d = Math.hypot(o.x - p.x, o.y - p.y); if (d < bd) { bd = d; c = o; } }
+      const h = handleOf(c), bx = h.x - Math.cos(c.ang) * 22, by = h.y - Math.sin(c.ang) * 22;
+      goal = { x: bx, y: by };
+      if (Math.hypot(h.x - p.x, h.y - p.y) < 50 && los(p.x, p.y, h.x, h.y)) { p.yaw = Math.atan2(c.y - p.y, c.x - p.x); hostGrabObj(p, c); spd = 0; }
+    } else {
+      let it = B.item;
+      if (!it || !G.items.includes(it) || it.holder || it.cart || deskOfItem(it) || it.claim !== p.id || danger(it.x, it.y)) {
+        if (it && it.claim === p.id) it.claim = null;
+        it = null; let bd = 1e9;
+        for (const o of G.items) {
+          if (o.holder || o.cart || deskOfItem(o) || (o.claim != null && o.claim !== p.id && PL.has(o.claim)) || danger(o.x, o.y)) continue;
+          const d = Math.hypot(o.x - p.x, o.y - p.y) - o.base / 40 - (o.d === HEAD && PL.get(o.owner) && PL.get(o.owner).dead ? 3000 : 0);
+          if (d < bd) { bd = d; it = o; }
+        }
+        B.item = it; if (it) it.claim = p.id;
+      }
+      if (it) {
+        goal = it;
+        const d = Math.hypot(it.x - p.x, it.y - p.y);
+        if (d < p.r + it.r + 34 && los(p.x, p.y, it.x, it.y)) {
+          p.yaw = Math.atan2(it.y - p.y, it.x - p.x);
+          if (hostGrabObj(p, it) && B.sayT <= 0) say(p, 'found');
+          spd = 0;
+        }
+      } else {
+        let hb = null, bd = 1e9;
+        for (const q of PL.values()) { if (q.bot || q.dead) continue; const d = Math.hypot(q.x - p.x, q.y - p.y); if (d < bd) { bd = d; hb = q; } }
+        if (hb && bd > 110) goal = hb;
+        if (B.sayT <= 0) { if (Math.random() < 0.3) say(p, 'idle'); else B.sayT = 8; }
+      }
+    }
+  }
+  B.steer = null;
+  if (mode !== 'flee' && p.hold && p.hold.kind === 'cart' && B.ctgt) goal = B.ctgt;
+  B.dbg = [mode, goal ? goal.x | 0 : -1, goal ? goal.y | 0 : -1, spd];
+  // 移動
+  let dx = 0, dy = 0;
+  if (mode === 'flee' && threat) {
+    // モンスターから遠い部屋を選んで、経路をたどって逃げる
+    B.fleeT = (B.fleeT || 0) - dt;
+    if (!B.flee || B.fleeT <= 0) {
+      let best = null, bs = -1e9;
+      const ax = threat.x - p.x, ay = threat.y - p.y, al = Math.hypot(ax, ay) || 1;
+      for (const r of MAP.rooms) {
+        const rx = r.cx - p.x, ry = r.cy - p.y, rl = Math.hypot(rx, ry) || 1;
+        const toward = (rx * ax + ry * ay) / (rl * al); // モンスターの方向にある部屋は避ける
+        let sc = Math.hypot(r.cx - threat.x, r.cy - threat.y) - 0.6 * rl - (toward > 0.2 ? 2000 : 0);
+        for (const m of G.mons) if (m !== threat && m.stun <= 0 && Math.hypot(m.x - r.cx, m.y - r.cy) < 250) sc -= 600;
+        if (sc > bs) { bs = sc; best = r; }
+      }
+      B.flee = best; B.fleeT = 2;
+    }
+    goal = { x: B.flee.cx, y: B.flee.cy };
+  } else B.flee = null;
+  if (B.steer && mode !== 'flee') { dx = B.steer.x - p.x; dy = B.steer.y - p.y; }
+  else if (goal && spd > 0) {
+    const w = botGoal(p, goal.x, goal.y);
+    if (Math.hypot(goal.x - p.x, goal.y - p.y) > (p.hold && p.hold.kind === 'item' ? 6 : 22)) { dx = w.x - p.x; dy = w.y - p.y; }
+  }
+  const l = Math.hypot(dx, dy), k = Math.min(1, dt * 8);
+  const tvx = l > 1 ? dx / l * spd : 0, tvy = l > 1 ? dy / l * spd : 0;
+  p.vx += (tvx - p.vx) * k; p.vy += (tvy - p.vy) * k;
+  p.x += p.vx * dt; p.y += p.vy * dt; collideTiles(p);
+  p.sprint = spd > 150 && l > 1;
+  if (Math.hypot(p.vx, p.vy) > 20 && !B.steer) p.yaw += angDiff(Math.atan2(p.vy, p.vx), p.yaw) * Math.min(1, dt * (p.hold ? 2.5 : 8));
+  p.pitch = p.hold ? -0.15 : 0;
+}
+function hostUpdate(dt) {
+  G.t += dt;
+  for (const p of PL.values()) if (p.bot && !p.dead) botThink(p, dt);
+  for (const p of PL.values()) {
+    p.inv -= dt;
+    if (p === ME || p.bot) { if (p.prevYaw != null) p.yawRate = (p.yawRate || 0) * 0.6 + angDiff(p.yaw, p.prevYaw) / dt * 0.4; p.prevYaw = p.yaw; }
+    else if (performance.now() - p.lastT > 200) p.yawRate = (p.yawRate || 0) * 0.8;
+    if (p !== ME && !p.bot && !p.dead && performance.now() - p.lastT < 250) { p.x += p.vx * dt; p.y += p.vy * dt; collideTiles(p); }
+    if (p.sprint && !p.dead) { p.noiseT -= dt; if (p.noiseT <= 0) { p.noiseT = 0.5; makeNoise(p.x, p.y, 200); } }
+  }
+  G.fieldT -= dt;
+  if (G.fieldT <= 0) { G.fieldT = 0.25; for (const p of PL.values()) p.field = p.dead ? null : bfs(MAP, Math.floor(p.x / T), Math.floor(p.y / T)); }
+  for (const m of G.mons) updMon(m, dt);
+  if (G.death) {
+    G.spawnT -= dt;
+    const cap = 8 + MAP.lv * 2 + PL.size, al = alive();
+    if (G.spawnT <= 0 && G.mons.length < cap && al.length) {
+      G.spawnT = Math.max(1.2, 4 - MAP.lv * 0.3 - PL.size * 0.2);
+      const types = ['wander', 'wander', 'runner'].concat(MAP.lv >= 3 ? ['brute'] : []), f = pick(al).field;
+      if (f) for (let k = 0; k < 60; k++) {
+        const tx = ri(1, MAP.W - 2), ty = ri(1, MAP.H - 2), d = f[ty * MAP.W + tx];
+        if (d >= 12 && d <= 30 && MAP.roomOf[ty * MAP.W + tx] !== 0) { const m = spawnMon(pick(types), (tx + 0.5) * T, (ty + 0.5) * T); m.state = 'chase'; break; }
+      }
+    }
+  }
+  for (const it of G.items) { it.hitCd -= dt; if (it.noCart) it.noCart = Math.max(0, it.noCart - dt); }
+  for (let s = 0; s < 3; s++) physics(dt / 3);
+  for (const it of G.items) if (!it.cart && !it.holder && !it.suck) { const f = Math.exp((it.z > groundAt(it) + 0.01 ? -0.3 : -3.2) * dt); it.vx *= f; it.vy *= f; }
+  for (const c of G.carts) {
+    if (!c.holder) { const f = Math.exp(-3 * dt); c.vx *= f; c.vy *= f; }
+    let cm = 2.6; for (const it of c.load) cm += it.m * 0.5; c.m = cm;
+    // 揺れ（加速度）で荷物が落ちる。誰かが持っていると安定する
+    const ax = (c.vx - c.pvx) / dt, ay = (c.vy - c.pvy) / dt; c.pvx = c.vx; c.pvy = c.vy;
+    c.accS = (c.accS || 0) * 0.75 + Math.hypot(ax, ay) * 0.25; const acc = c.accS; // 一瞬の揺れより、続く揺れで落ちる
+    c.load.forEach((it, i) => {
+      const top = i >= CART_LAYER, sec = secureIn(it);
+      const lim = c.holder ? (sec && !top ? Infinity : top ? 2600 : 1400) : (sec && !top ? 2800 : 900);
+      if (acc > lim && Math.random() < 0.5) spill(c, it, ax, ay);
+    });
+  }
+  for (const it of G.items) {
+    if (it.cart) {
+      const c = it.cart, ca = Math.cos(c.ang), sa = Math.sin(c.ang);
+      it.x = c.x + it.lx * ca - it.ly * sa; it.y = c.y + it.lx * sa + it.ly * ca; it.vx = c.vx; it.vy = c.vy; it.z = 0; it.vz = 0;
+    } else if (!it.holder && !it.noCart && !it.suck && it.z < 1.0) {
+      for (const c of G.carts) {
+        const ca = Math.cos(c.ang), sa = Math.sin(c.ang), dx = it.x - c.x, dy = it.y - c.y;
+        const lx = dx * ca + dy * sa, ly = -dx * sa + dy * ca;
+        if (Math.abs(lx) > CART_HL || Math.abs(ly) > CART_HW) continue;
+        it.cart = c; it.lx = lx; it.ly = ly; c.load.push(it); ev('clunk', c.x | 0, c.y | 0);
+        if (!secureIn(it) || c.load.length > CART_LAYER) ev('wobble', it.x | 0, it.y | 0);
+        break;
+      }
+    }
+  }
+  // ---- 穴に落ちる ----
+  for (const p of PL.values()) if (!p.dead && (p.z || 0) <= 0.05 && tileAt(p.x, p.y) === 2) killPlayer(p, 'pit');
+  for (const it of [...G.items]) {
+    if (it.holder || it.cart || it.suck || it.z > 0.05 || tileAt(it.x, it.y) !== 2) continue;
+    if (it.d === HEAD) { it.x = MAP.truck.room.cx; it.y = MAP.truck.room.cy; it.z = 1; it.vx = it.vy = 0; ev('toast', '頭が穴に落ちたのでバスに戻った', '#ffb74d', 2, -1); continue; }
+    G.items = G.items.filter(o => o !== it); G.broken++; ev('fall', it.x | 0, it.y | 0, it.n);
+  }
+  for (const c of G.carts) if (!c.holder && tileAt(c.x, c.y) === 2) {
+    for (const it of [...c.load]) { G.items = G.items.filter(o => o !== it); G.broken++; }
+    c.load = []; ev('fall', c.x | 0, c.y | 0, 'カート'); c.x = MAP.truck.room.cx; c.y = MAP.truck.room.cy - T * 0.5; c.vx = c.vy = 0;
+  }
+  for (const m of [...G.mons]) if (!m.holder && tileAt(m.x, m.y) === 2) { G.mons = G.mons.filter(o => o !== m); G.kills++; ev('fall', m.x | 0, m.y | 0, '敵'); }
+  for (const d of MAP.desks) if (d.anim != null) {
+    const pv = d.anim; d.anim += dt;
+    if (pv < 0.8 && d.anim >= 0.8) deskActivate(d);
+    if (pv < 1.6 && d.anim >= 1.6) deskFinish(d);
+    if (d.anim >= 2.5) d.anim = null;
+  }
+  for (const p of PL.values()) {
+    const o = p.hold; if (!o) continue;
+    if (p.pullT > 0) { p.pullT -= dt; const q = o.kind === 'cart' ? handleOf(o) : o; if (Math.hypot(q.x - p.x, q.y - p.y) < (o.kind === 'cart' ? 60 : p.r + o.r + 60)) p.pullT = 0; }
+    const pt = o.kind === 'cart' ? handleOf(o) : o, lim = (o.kind === 'cart' ? 75 : p.r + o.r + 130) + reachExtra() * (p.pullT > 0 ? 1 : 0);
+    p.noLos = los(p.x, p.y, pt.x, pt.y) ? 0 : (p.noLos || 0) + dt;
+    if (Math.hypot(pt.x - p.x, pt.y - p.y) > lim || p.noLos > 0.35) { hostRelease(p); toastTo(p, '手から離れた！', '#ffb74d', 1.2); }
+  }
+}
+function updMon(m, dt) {
+  const S = MONS[m.type];
+  m.atkCd -= dt; m.losT -= dt; m.growlT -= dt;
+  if (m.losT <= 0) {
+    m.losT = 0.15; m.sees = null; let bd = 1e9;
+    for (const p of PL.values()) {
+      if (p.dead) continue;
+      const d = Math.hypot(p.x - m.x, p.y - m.y);
+      if (d < S.sight * (G.death ? 1.5 : 1) * (p.crouch && !p.sprint ? 0.5 : 1) && d < bd && los(m.x, m.y, p.x, p.y)) { bd = d; m.sees = p; }
+    }
+  }
+  if (m.thrownT > 0) m.thrownT -= dt;
+  if (m.holder) { // つかまれている：もがいて振りほどく
+    m.struggle = (m.struggle || 0) + dt; m.face += Math.sin(G.t * 20) * 0.2;
+    const hold = strLv() >= 10 ? Infinity : (2.5 + 0.8 * strLv()) * (1 + (m.helpers ? m.helpers.length : 0)); // STRが高いほど振りほどけない（Lv10で離さない）
+    if (m.struggle > hold) { for (const q of [...(m.helpers || [])]) { hostRelease(q); toastTo(q, '振りほどかれた！', '#ff8a80', 1.5); } const h = m.holder; hostRelease(h); m.stun = 0; toastTo(h, '振りほどかれた！', '#ff8a80', 1.5); }
+    return;
+  }
+  if (m.stun > 0) { m.stun -= dt; const f = m.thrownT > 0 ? Math.exp(-1.2 * dt) : 0.9; m.vx *= f; m.vy *= f; return; }
+  if (m.sees && m.state !== 'retreat') {
+    if (m.state !== 'chase') { ev('growl', m.x | 0, m.y | 0, MT.indexOf(m.type)); m.growlT = rnd(4, 8); }
+    m.state = 'chase'; m.tgt = m.sees.id; m.lostT = 0; m.lx = m.sees.x; m.ly = m.sees.y;
+  }
+  if (G.death && m.state !== 'retreat') m.state = 'chase';
+  let tp = PL.get(m.tgt);
+  if (m.state === 'chase' && (!tp || tp.dead || (G.death && !m.sees))) {
+    if (G.death) { // 一番近い生存者を狙う
+      const i = Math.floor(m.y / T) * MAP.W + Math.floor(m.x / T); let bd = 1e9; tp = null;
+      for (const p of PL.values()) { if (p.dead || !p.field) continue; const d = p.field[i]; if (d >= 0 && d < bd) { bd = d; tp = p; } }
+      if (tp) m.tgt = tp.id;
+    } else if (!tp || tp.dead) { m.state = 'wander'; m.goalField = null; tp = null; }
+  }
+  if (m.growlT <= 0) { m.growlT = rnd(5, 11); ev('growl', m.x | 0, m.y | 0, MT.indexOf(m.type), 1); }
+  let tgt = null, spd = S.spd;
+  if (m.state === 'retreat') {
+    m.rt -= dt; spd = S.chase * 0.9;
+    if (tp) tgt = { x: m.x - (tp.x - m.x), y: m.y - (tp.y - m.y) };
+    if (m.rt <= 0) { m.state = 'wander'; m.goalField = null; }
+  } else if (m.state === 'chase' && tp) {
+    spd = S.chase * (G.death ? 1.12 : 1);
+    if (!m.sees && !G.death) { m.lostT += dt; if (m.lostT > 3.5) { setGoal(m, m.lx, m.ly); m.state = 'investigate'; } }
+    const d = Math.hypot(tp.x - m.x, tp.y - m.y);
+    if (m.sees === tp && d < T * 2.2) tgt = { x: tp.x, y: tp.y };
+    else tgt = flowDir(m, tp.field) || { x: tp.x, y: tp.y };
+  } else {
+    if (!m.goalField || m.goalT <= 0) wanderGoal(m);
+    m.goalT -= dt;
+    tgt = flowDir(m, m.goalField);
+    if (m.state === 'investigate') spd = S.spd * 1.5;
+    if (!tgt) { m.idle -= dt; if (m.idle <= 0) { m.state = 'wander'; wanderGoal(m); } }
+  }
+  if (tgt) {
+    const tx = tgt.x - m.x, ty = tgt.y - m.y, tl = Math.hypot(tx, ty) || 1, k = Math.min(1, dt * 6);
+    m.vx += (tx / tl * spd - m.vx) * k; m.vy += (ty / tl * spd - m.vy) * k;
+  } else { m.vx *= 0.85; m.vy *= 0.85; }
+  const fa = m.sees ? Math.atan2(m.sees.y - m.y, m.sees.x - m.x) : Math.atan2(m.vy, m.vx);
+  if (Math.hypot(m.vx, m.vy) > 5 || m.sees) m.face += angDiff(fa, m.face) * Math.min(1, dt * 8);
+  if (m.atkCd <= 0 && !m.holder) for (const p of PL.values()) {
+    if (p.dead || Math.hypot(p.x - m.x, p.y - m.y) > m.r + p.r + 6) continue;
+    hurtPlayer(p, S.dmg, m); m.atkCd = 1.1;
+    if (m.type === 'runner') { m.state = 'retreat'; m.rt = 1.6; }
+    break;
+  }
+}
+
+// ---- スナップショット ----
+function makeSnap() {
+  const P = [], I = [], C = [], M = [];
+  for (const p of PL.values()) P.push([p.id, Math.round(p.x), Math.round(p.y), Math.round(p.yaw * 100), Math.round(p.pitch * 100), Math.ceil(p.hp), p.dead ? 1 : 0, p.hold ? (p.hold.kind === 'mon' ? MON_ID + p.hold.id : p.hold.id) : -99, Math.round((p.z || 0) * 100), p.crouch ? 1 : 0, p.ammo || 0]);
+  for (const it of G.items) I.push([it.id, it.d, Math.round(it.x), Math.round(it.y), it.holder ? 1 : it.cart ? 2 : it.suck ? 3 : 0, Math.round(it.val), it.base, it.cart ? it.cart.idx : -1, Math.round(it.lx), Math.round(it.ly), it.holder ? it.holder.id : -1, it.cart ? it.cart.load.indexOf(it) : 0, Math.round(it.z * 100), it.suck ? MAP.desks.indexOf(it.suck) : -1, it.holder ? 1 + (it.helpers ? it.helpers.length : 0) : 0, it.owner != null ? it.owner : -1]);
+  for (const c of G.carts) C.push([Math.round(c.x), Math.round(c.y), Math.round(c.ang * 100), c.holder ? c.holder.id : -1]);
+  for (const m of G.mons) M.push([m.id, MT.indexOf(m.type), Math.round(m.x), Math.round(m.y), Math.round(m.face * 100), m.stun > 0 || m.holder ? 2 : m.state === 'chase' ? 1 : 0, Math.ceil(m.hp), m.holder ? 1 : 0]);
+  const D = MAP.desks.map(d => d.anim == null ? -1 : Math.round(d.anim * 100) / 100);
+  return { t: 's', P, I, C, M, D, g: [G.sold, G.quota, G.death ? 1 : 0, RUN.money, RUN.inv.heal, RUN.inv.flash, MAP.lv] };
+}
+function applySnap(s, instant) {
+  [GS.sold, GS.quota, GS.death, GS.money, GS.heal, GS.flash, GS.lv] = s.g;
+  if (s.D && !instant) s.D.forEach((a, i) => { const d = MAP.desks[i]; if (d) d.anim = a < 0 ? null : a; });
+  const seen = new Set();
+  for (const a of s.P) {
+    let v = V.players.get(a[0]);
+    if (!v) { v = { id: a[0], cx: a[1], cy: a[2] }; V.players.set(a[0], v); }
+    v.x = a[1]; v.y = a[2]; v.yaw = a[3] / 100; v.pitch = a[4] / 100; v.hp = a[5]; v.dead = !!a[6]; v.hold = a[7]; v.z = (a[8] || 0) / 100; v.cr = !!a[9]; v.ammo = a[10] || 0;
+    if (instant) { v.cx = v.x; v.cy = v.y; }
+    seen.add(a[0]);
+  }
+  for (const id of [...V.players.keys()]) if (!seen.has(id)) V.players.delete(id);
+  seen.clear();
+  for (const a of s.I) {
+    let v = V.items.get(a[0]);
+    if (!v) { v = { id: a[0], d: a[1], cx: a[2], cy: a[3] }; V.items.set(a[0], v); }
+    v.x = a[2]; v.y = a[3]; v.st = a[4]; v.val = a[5]; v.base = a[6]; v.cart = a[7]; v.lx = a[8]; v.ly = a[9]; v.holder = a[10]; v.layer = a[11]; v.z = a[12] / 100; v.desk = a[13]; v.nh = a[14] || 0; v.owner = a[15];
+    if (v.cz == null) v.cz = v.z;
+    if (instant) { v.cx = v.x; v.cy = v.y; v.cz = v.z; }
+    seen.add(a[0]);
+  }
+  for (const id of [...V.items.keys()]) if (!seen.has(id)) V.items.delete(id);
+  s.C.forEach((a, i) => {
+    let v = V.carts[i];
+    if (!v) v = V.carts[i] = { cx: a[0], cy: a[1], cang: a[2] / 100 };
+    v.x = a[0]; v.y = a[1]; v.ang = a[2] / 100; v.holder = a[3];
+    if (instant) { v.cx = v.x; v.cy = v.y; v.cang = v.ang; }
+  });
+  V.carts.length = s.C.length;
+  seen.clear();
+  for (const a of s.M) {
+    let v = V.mons.get(a[0]);
+    if (!v) { v = { id: a[0], type: MT[a[1]], cx: a[2], cy: a[3], cf: a[4] / 100 }; V.mons.set(a[0], v); }
+    v.x = a[2]; v.y = a[3]; v.face = a[4] / 100; v.st = a[5]; v.hp = a[6]; v.held = !!a[7];
+    if (instant) { v.cx = v.x; v.cy = v.y; v.cf = v.face; }
+    seen.add(a[0]);
+  }
+  for (const id of [...V.mons.keys()]) if (!seen.has(id)) V.mons.delete(id);
+  if (isClient() && ME) {
+    const me = V.players.get(myId);
+    if (me) { ME.hp = me.hp; ME.dead = !!me.dead; ME.hold = me.hold === -99 ? null : me.hold; }
+  }
+}
+function smoothView(dt) {
+  if (!V) return;
+  const k = Math.min(1, dt * 12);
+  for (const v of V.players.values()) { v.cx += (v.x - v.cx) * k; v.cy += (v.y - v.cy) * k; }
+  for (const v of V.items.values()) { v.cx += (v.x - v.cx) * k; v.cy += (v.y - v.cy) * k; v.cz += (v.z - v.cz) * k; }
+  for (const v of V.mons.values()) { v.cx += (v.x - v.cx) * k; v.cy += (v.y - v.cy) * k; v.cf += angDiff(v.face, v.cf) * k; }
+  for (const v of V.carts) { v.cx += (v.x - v.cx) * k; v.cy += (v.y - v.cy) * k; v.cang += angDiff(v.ang, v.cang) * k; }
+}
+
+// ================= イベント（音・演出：全員共通） =================
+const FX = { tracers: [], muzzle: 0, parts: [], texts: [], msg: null, hurt: 0, flash: 0, shake: 0, beatT: 0, says: {}, chat: [] };
+function renderChat() {
+  const el = $('chat'); if (!el) return;
+  el.innerHTML = FX.chat.map(c => `<div><span style="color:${colOf(c.id)}">${esc(nameOf(c.id))}</span>：${esc(c.text)}</div>`).join('');
+  el.style.bottom = isTouch ? '330px' : '14px';
+}
+function toastLocal(text, col = '#fff', t = 2.5) { FX.msg = { text, col, t }; }
+function floatText(x, y, h, text, col) { FX.texts.push({ x, y, h, text, col, t: 1.3 }); }
+function burst(x, y, h, n, col, sp = 200, sz = 3) {
+  for (let i = 0; i < n; i++) { const a = Math.random() * 6.28, s = rnd(sp * 0.3, sp); FX.parts.push({ x, y, h, vx: Math.cos(a) * s, vy: Math.sin(a) * s, vh: rnd(1, 4), t: rnd(0.4, 0.9), c: col, s: rnd(sz * 0.5, sz * 1.4) }); }
+}
+const nameOf = id => { const r = ROSTER.find(o => o.id === id); return r ? r.name : '???'; };
+const colOf = id => { const r = ROSTER.find(o => o.id === id); return (r && r.col) || PCOL[id % 6]; };
+function handleEvent(a) {
+  const [k] = a;
+  switch (k) {
+    case 'toast': if (a[4] === -1 || a[4] === myId) toastLocal(a[1], a[2], a[3]); break;
+    case 'deny': if (a[1] === myId) sfx('deny'); break;
+    case 'grab': if (a[1] === myId) sfx('grab'); break;
+    case 'drop': if (a[1] === myId) sfx('drop'); break;
+    case 'crash': sfx('crash', volAt(a[1], a[2])); floatText(a[1], a[2], 0.8, '-' + yen(a[3]), '#ff6b5a'); burst(a[1], a[2], 0.5, 4, '#ddd', 90, 2); break;
+    case 'break': sfx('break', volAt(a[1], a[2])); burst(a[1], a[2], 0.5, 24, '#ffd84d', 240, 3); floatText(a[1], a[2], 1.2, a[3] + (a[4] ? ' がはみ出して壊れた！' : ' が壊れた！'), '#ff5a4d'); break;
+    case 'deliver': { const d = MAP && MAP.desks[a[1]]; if (!d) break; if (isClient()) d.anim = 0; tone(900, 0.8, 'triangle', 0.05 * Math.max(0.3, volAt(d.btn.x, d.btn.y)), -800); break; }
+    case 'field': { const d = MAP && MAP.desks[a[1]]; if (!d) break; const v = Math.max(0.3, volAt(d.btn.x, d.btn.y)); noiseBurst(0.4, 0.6 * v, 500); tone(70, 0.5, 'sine', 0.35 * v, -30); if (volAt(d.btn.x, d.btn.y) > 0.4) FX.shake = 10; burst(d.zone.x + d.zone.w / 2, d.zone.y + d.zone.h / 2, 0.1, 26, '#9a9a9a', 260, 4); if (a[3]) toastLocal(a[3] + '個がエリアからはみ出して壊れた！', '#ff5a4d', 2.5); else if (!a[2]) toastLocal('何も回収できなかった…', '#ff8a80', 2); break; }
+    case 'spill': sfx('clunk', volAt(a[1], a[2])); floatText(a[1], a[2], 1, 'カートから落ちた！', '#ffb74d'); break;
+    case 'wobble': floatText(a[1], a[2], 1.1, 'グラグラ…', '#ffb74d'); break;
+    case 'sell': {
+      const d = MAP && MAP.desks[a[1]]; if (!d) break;
+      d.glow = 1; sfx('sell', Math.max(0.4, volAt(d.btn.x, d.btn.y)));
+      burst(d.zone.x + d.zone.w / 2, d.zone.y + d.zone.h / 2, 0.5, 30, '#ffd84d', 200);
+      floatText(d.btn.x, d.btn.y, 1.8, '+' + yen(a[2]), '#ffd84d');
+      toastLocal(a[3] + '個納品  +' + yen(a[2]), '#ffd84d', 2.5); break;
+    }
+    case 'death': FX.shake = 14; sfx('alarm'); toastLocal('ノルマ達成！ 闇が来る――全員バスへ戻れ！', '#ff5a4d', 5); break;
+    case 'heal': if (a[1] === myId) sfx('heal'); { const v = V && V.players.get(a[1]); if (v) burst(v.x, v.y, 1, 14, '#7dffa0', 120); } break;
+    case 'flash': sfx('flash', Math.max(0.2, volAt(a[1], a[2]))); if (ME && Math.hypot(a[1] - ME.x, a[2] - ME.y) < 400) FX.flash = 1; break;
+    case 'hurt': if (a[1] === myId && ME) { ME.vx += a[2]; ME.vy += a[3]; FX.hurt = 1; FX.shake = 12; sfx('hit'); try { navigator.vibrate && navigator.vibrate(120); } catch (e) {} } break;
+    case 'pdie': burst(a[2], a[3], 1, 40, colOf(a[1]), 260, 4); if (a[4]) tone(500, 1.2, 'sawtooth', 0.15 * Math.max(0.3, volAt(a[2], a[3])), -440); if (a[1] === myId && ME) { ME.dead = true; sfx('hit'); } break;
+    case 'revive': if (a[1] === myId && ME) { ME.dead = false; ME.hp = 1; ME.x = a[2]; ME.y = a[3]; ME.vx = ME.vy = 0; ME.z = 0; } sfx('heal'); break;
+    case 'fall': floatText(a[1], a[2], 0.5, a[3] + 'が穴に落ちた…', '#ff8a80'); tone(600, 0.9, 'triangle', 0.08 * Math.max(0.2, volAt(a[1], a[2])), -520); break;
+    case 'growl': { const v = volAt(a[1], a[2]) * (a[4] ? 0.6 : 1); sfx(a[3] === 1 && !a[4] ? 'shriek' : 'growl', v); break; }
+    case 'monhit': sfx('monhit', volAt(a[1], a[2])); floatText(a[1], a[2], 1.8, '-' + a[3], '#7fd6ff'); burst(a[1], a[2], 1, 8, '#2a2a2a', 160); break;
+    case 'mondie': sfx('mondie', volAt(a[1], a[2])); burst(a[1], a[2], 1, 30, '#6a2a80', 220, 4); floatText(a[1], a[2], 2, '敵を倒した！ 球を落とした（' + yen(a[3]) + '）', '#7fd6ff'); break;
+    case 'clunk': sfx('clunk', volAt(a[1], a[2])); break;
+    case 'shot': {
+      const v = Math.max(0.25, volAt(a[2], a[3]));
+      noiseBurst(0.18, 0.7 * v, 3500); tone(140, 0.12, 'square', 0.25 * v, -80);
+      FX.tracers.push({ x0: a[2], y0: a[3], x1: a[4], y1: a[5], t: 0.12, me: a[1] === myId });
+      if (a[1] === myId && ME) { FX.muzzle = 0.08; ME.pitch = Math.min(1.2, ME.pitch + 0.05); FX.shake = Math.max(FX.shake, 4); }
+      if (a[6]) burst(a[4], a[5], 1.2, 10, '#ff3a2a', 150, 3); else burst(a[4], a[5], 1.3, 6, '#ddd', 90, 2);
+      break;
+    }
+    case 'say': {
+      FX.says[a[1]] = { text: a[2], t: 4 };
+      FX.chat.push({ id: a[1], text: a[2], t: 8 }); if (FX.chat.length > 4) FX.chat.shift();
+      renderChat(); tone(700 + (a[1] % 4) * 120, 0.05, 'sine', 0.03); break;
+    }
+  }
+}
+
+// ================= 入力 =================
+const keys = {};
+const mouse = { down: false };
+let touchHeld = false, locked = false, dashToggle = false, grabCd = 0, relCd = 0, jumpReq = false, crouchOn = false;
+const touches = { move: null, look: null };
+const typing = e => e.target && e.target.tagName === 'INPUT';
+addEventListener('keydown', e => {
+  if (typing(e)) return;
+  const k = e.key.toLowerCase(); keys[k] = true;
+  if (!playing || anyScr()) return;
+  if (k === 'e') localAct();
+  if (k === 'q') localCmd('heal');
+  if (k === 'f') localCmd('flash');
+  if (k === 'g') localShoot();
+  if (k === 'v') toggleMic();
+  if (k === 'escape') openMenu();
+  if (k === ' ') jumpReq = true;
+  if (k === 'c') setCrouch(!crouchOn);
+  if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault();
+});
+addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+addEventListener('blur', () => { for (const k in keys) keys[k] = false; mouse.down = false; });
+gl.addEventListener('contextmenu', e => e.preventDefault());
+gl.addEventListener('pointerdown', e => {
+  initAudio();
+  if (e.pointerType === 'mouse') {
+    if (!playing || anyScr()) return;
+    if (!locked) lockMouse(); // 固定できない環境でも、そのままつかめるようにする
+    if (e.button === 0) mouse.down = true;
+    if (e.button === 2) localShoot();
+    return;
+  }
+  if (!isTouch) { isTouch = true; $('touch').classList.toggle('on', playing && !anyScr()); }
+  const t = { id: e.pointerId, ox: e.clientX, oy: e.clientY, x: e.clientX, y: e.clientY };
+  if (e.clientX < VW * 0.45) { if (!touches.move) touches.move = t; } else if (!touches.look) touches.look = t;
+  updStickUI();
+});
+addEventListener('pointermove', e => {
+  if (e.pointerType === 'mouse') return;
+  const lk = touches.look;
+  if (lk && lk.id === e.pointerId && ME) { ME.yaw += (e.clientX - lk.x) * 0.0065; ME.pitch = clamp(ME.pitch - (e.clientY - lk.y) * 0.0055, -1.2, 1.2); lk.x = e.clientX; lk.y = e.clientY; }
+  const mv = touches.move;
+  if (mv && mv.id === e.pointerId) { mv.x = e.clientX; mv.y = e.clientY; updStickUI(); }
+});
+const endPtr = e => {
+  if (e.pointerType === 'mouse') { if (e.button === 0) mouse.down = false; return; }
+  for (const k of ['move', 'look']) if (touches[k] && touches[k].id === e.pointerId) touches[k] = null;
+  updStickUI();
+};
+addEventListener('pointerup', endPtr); addEventListener('pointercancel', endPtr);
+document.addEventListener('mousemove', e => {
+  if (!ME || !playing || anyScr() || isTouch) return;
+  ME.yaw += e.movementX * 0.0024; ME.pitch = clamp(ME.pitch - e.movementY * 0.0024, -1.2, 1.2);
+});
+addEventListener('wheel', e => { if (!ME || !playing || anyScr()) return; ME.holdD = clamp((ME.holdD || 0) - e.deltaY * 0.06, -10, 70); }, { passive: true });
+document.addEventListener('pointerlockchange', () => {
+  locked = document.pointerLockElement === gl;
+  if (!locked) mouse.down = false;
+});
+function stickVec(t, max = 50) {
+  if (!t) return { x: 0, y: 0, l: 0 };
+  let dx = t.x - t.ox, dy = t.y - t.oy; const l = Math.hypot(dx, dy);
+  if (l > max) { dx *= max / l; dy *= max / l; }
+  return { x: dx, y: dy, l };
+}
+function updStickUI() {
+  const el = $('stkL'), t = touches.move;
+  if (!t) { el.style.display = 'none'; return; }
+  const v = stickVec(t);
+  el.style.display = 'block'; el.style.left = t.ox + 'px'; el.style.top = t.oy + 'px';
+  el.firstChild.style.transform = `translate(${v.x}px,${v.y}px)`;
+}
+function goFull() {
+  const d = document.documentElement;
+  try { if (!document.fullscreenElement && !document.webkitFullscreenElement) { const f = d.requestFullscreen || d.webkitRequestFullscreen; const r = f && f.call(d, { navigationUI: 'hide' }); if (r && r.catch) r.catch(() => {}); } } catch (e) {}
+  try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {}); } catch (e) {}
+}
+function lockMouse() { if (isTouch || locked) return; try { const r = gl.requestPointerLock(); if (r && r.catch) r.catch(() => {}); } catch (e) {} }
+// ボタンを押したとき（ユーザー操作の中）に全画面へ
+document.addEventListener('click', e => { if (e.target.closest && e.target.closest('.btn')) goFull(); }, true);
+$('bFull').addEventListener('pointerdown', e => {
+  e.stopPropagation(); e.preventDefault();
+  if (document.fullscreenElement || document.webkitFullscreenElement) { try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (er) {} }
+  else goFull();
+});
+function tbtn(id, fn) { $(id).addEventListener('pointerdown', e => { e.stopPropagation(); e.preventDefault(); initAudio(); fn(); }); }
+function setCrouch(v) { crouchOn = v; $('bCrouch').classList.toggle('on', v); }
+tbtn('bJump', () => { jumpReq = true; });
+tbtn('bCrouch', () => setCrouch(!crouchOn));
+tbtn('bAct', () => localAct());
+$('bDepart').addEventListener('pointerdown', e => { e.stopPropagation(); e.preventDefault(); initAudio(); localAct(); });
+tbtn('bHeal', () => localCmd('heal'));
+tbtn('bFlash', () => localCmd('flash'));
+tbtn('bShoot', () => localShoot());
+tbtn('bDash', () => { dashToggle = !dashToggle; $('bDash').classList.toggle('on', dashToggle); });
+tbtn('bGrab', () => {
+  if (!ME || ME.dead) return;
+  if (myHold() != null) { touchHeld = false; return sendRel(); }
+  const id = findGrabV(); touchHeld = id != null;
+  if (id == null) { sfx('deny'); return toastLocal('つかめる物がない（カートは持ち手を狙う）', '#ff8a80', 1.5); }
+  sendGrab(id);
+});
+function myHold() { if (!ME) return null; if (!isClient()) return ME.hold ? ME.hold.id : null; return ME.hold; }
+function sendGrab(id) { if (isClient()) netSend({ t: 'grab', id }); else hostGrab(ME, id); }
+function sendRel() { if (isClient()) netSend({ t: 'rel' }); else hostRelease(ME); }
+function localAct() { if (!ME || ME.dead) return; if (isClient()) netSend({ t: 'act' }); else hostAct(ME); }
+function localShoot() { if (!ME || ME.dead) return; if (isClient()) netSend({ t: 'shoot', yw: +ME.yaw.toFixed(3) }); else hostShoot(ME); }
+function localCmd(c) { if (!ME || ME.dead) return; if (isClient()) netSend({ t: c }); else (c === 'heal' ? hostHeal : hostFlash)(ME); }
+// 狙っている物（表示用の状態から探す）。カートは持ち手だけがつかめる
+function findGrabV() {
+  if (!V || !ME) return null;
+  const fx = Math.cos(ME.yaw), fy = Math.sin(ME.yaw), reach = 115 + reachExtra();
+  let best = null, bs = 1e9;
+  // 画面中央（照準）に近い物を、少し広めの範囲で選ぶ
+  const test = (id, x, y, r) => {
+    const dx = x - ME.x, dy = y - ME.y, d = Math.hypot(dx, dy);
+    if (d > reach + r) return;
+    const along = dx * fx + dy * fy;
+    if (along < -r * 0.5) return;
+    const ang = Math.abs(Math.atan2(dx * fy - dy * fx, along));
+    const lim = Math.atan2(r + 22, Math.max(d, 1)) + 0.18;
+    if (ang > lim) return;
+    const s = d * 0.6 + ang * 120;
+    if (s < bs && los(ME.x, ME.y, x, y)) { bs = s; best = id; }
+  };
+  for (const v of V.items.values()) if (v.st === 0 || v.st === 2 || (v.st === 1 && v.holder !== myId)) test(v.id, v.cx, v.cy, ITEMS[v.d].r * (v.st === 2 ? 0.8 : 1));
+  for (const v of V.mons.values()) test(MON_ID + v.id, v.cx, v.cy, MONS[v.type].r);
+  V.carts.forEach((c, i) => { if (c.holder !== myId) test(-(i + 1), c.cx - Math.cos(c.cang) * HANDLE_OFF, c.cy - Math.sin(c.cang) * HANDLE_OFF, 20); });
+  return best;
+}
+function heldMass() {
+  const h = myHold(); if (h == null || !V) return 0;
+  if (h < 0) return 3;
+  if (h >= MON_ID) { const m = V.mons.get(h - MON_ID); return m ? ({ wander: 3, runner: 1.5, brute: 8 })[m.type] : 3; }
+  const v = V.items.get(h); return v ? ITEMS[v.d].m / Math.max(1, v.nh || 1) : 0;
+}
+
+// ---- コントローラー（Gamepad API） ----
+// Lスティック：移動 / Rスティック：視点 / ZR：つかむ / A・B：ジャンプ / X：しゃがむ
+// ZL：つかむ（ZL＋Rスティック上下で距離）/ Y：アクション（納品・出発） / L3：ダッシュ / L：回復 / R：拳銃 / 十字キー上：閃光 / +（START）：メニュー
+const PAD = { on: false, mx: 0, my: 0, grab: false, dash: false, prev: {} };
+function pollPad(dt) {
+  let gp = null;
+  try { for (const g of (navigator.getGamepads ? navigator.getGamepads() : [])) if (g && g.connected) { gp = g; break; } } catch (e) {}
+  if (!gp) { if (PAD.on) { PAD.on = false; PAD.grab = PAD.dash = false; PAD.mx = PAD.my = 0; } return; }
+  if (!PAD.on) { PAD.on = true; toastLocal('🎮 コントローラーを認識しました', '#9fd3ff', 2); }
+  const dz = v => Math.abs(v || 0) < 0.15 ? 0 : v;
+  const b = i => !!(gp.buttons[i] && (gp.buttons[i].pressed || gp.buttons[i].value > 0.5));
+  const nin = /nintendo|pro controller|joy-con|057e/i.test(gp.id);
+  const btn = { a: nin ? 1 : 0, b: nin ? 0 : 1, x: nin ? 3 : 2, y: nin ? 2 : 3 };
+  const now = {}; for (let i = 0; i < gp.buttons.length; i++) now[i] = b(i);
+  const old = PAD.prev; PAD.prev = now;
+  const hit = i => now[i] && !old[i];
+  if (anyScr()) { // 画面メニュー：A/B で最初のボタン、START でゲームに戻る
+    if (hit(btn.a) || hit(btn.b)) { const sc = document.querySelector('.scr.show'), bt = sc && [...sc.querySelectorAll('.btn')].find(x => !x.disabled && x.offsetParent); if (bt) bt.click(); }
+    if (hit(9) && $('sPause').classList.contains('show')) showScr(null);
+    PAD.mx = PAD.my = 0; PAD.grab = PAD.dash = false;
+    return;
+  }
+  if (!playing || !ME) return;
+  initAudio();
+  PAD.mx = dz(gp.axes[0]); PAD.my = dz(gp.axes[1]);
+  const rx = dz(gp.axes[2]), ry = dz(gp.axes[3]);
+  ME.yaw += rx * Math.abs(rx) * 3.2 * dt;
+  if (b(6)) ME.holdD = clamp((ME.holdD || 0) - ry * 90 * dt, -10, 70); // ZL＋R上で遠ざける・下で近づける
+  else ME.pitch = clamp(ME.pitch - ry * Math.abs(ry) * 2.4 * dt, -1.2, 1.2);
+  PAD.grab = b(7) || b(6); PAD.dash = b(10);
+  if (hit(btn.a) || hit(btn.b)) jumpReq = true;
+  if (hit(btn.x)) setCrouch(!crouchOn);
+  if (hit(btn.y)) localAct();
+  if (hit(4)) localCmd('heal');
+  if (hit(5)) localShoot();
+  if (hit(12)) localCmd('flash');
+  if (hit(9)) openMenu();
+}
+addEventListener('gamepadconnected', () => { PAD.prev = {}; });
+// ---- 自分の操作 ----
+function controlMe(dt) {
+  const p = ME;
+  if (!p || p.dead) return;
+  let mx = 0, my = 0;
+  if (keys.w) my += 1; if (keys.s) my -= 1;
+  if (keys.a) mx -= 1; if (keys.d) mx += 1;
+  if (keys.arrowleft) p.yaw -= 2.4 * dt; if (keys.arrowright) p.yaw += 2.4 * dt;
+  if (keys.arrowup) p.pitch = Math.min(1.2, p.pitch + 1.8 * dt); if (keys.arrowdown) p.pitch = Math.max(-1.2, p.pitch - 1.8 * dt);
+  const ms = stickVec(touches.move);
+  if (ms.l > 8) { mx = ms.x / 50; my = -ms.y / 50; }
+  if (PAD.mx || PAD.my) { mx = PAD.mx; my = -PAD.my; }
+  const ml = Math.hypot(mx, my); if (ml > 1) { mx /= ml; my /= ml; }
+  const moving = ml > 0.1;
+  const fx = Math.cos(p.yaw), fy = Math.sin(p.yaw), rx = -fy, ry = fx;
+  const wx = fx * my + rx * mx, wy = fy * my + ry * mx;
+  if (jumpReq && p.z <= 0 && !p.crouch) { p.vz = 4.3; sfx('step', 1); }
+  jumpReq = false;
+  if (p.z > 0 || p.vz > 0) { p.z += p.vz * dt; p.vz -= 13 * dt; if (p.z <= 0) { p.z = 0; p.vz = 0; sfx('step', 0.8); } }
+  p.crouch = crouchOn && p.z <= 0;
+  const sprint = (keys.shift || dashToggle || PAD.dash) && moving && !p.exh && !p.crouch;
+  let spd = moveSpd();
+  if (sprint) {
+    spd *= 1.6; p.sta -= 30 * dt; p.staCd = 1;
+    if (p.sta <= 0) { p.sta = 0; p.exh = true; toastLocal('息切れ…', '#4fc3f7', 1.2); }
+  } else {
+    p.staCd -= dt; if (p.staCd <= 0) p.sta = Math.min(maxSta(), p.sta + 24 * dt);
+    if (p.exh && p.sta > maxSta() * 0.3) p.exh = false;
+  }
+  p.sprint = sprint;
+  if (p.crouch) spd *= 0.5;
+  const hm = heldMass(); if (hm) spd *= clamp(1 - (hm - strength()) * 0.13, 0.42, 1);
+  const k = Math.min(1, dt * 12);
+  p.vx += (wx * spd - p.vx) * k; p.vy += (wy * spd - p.vy) * k;
+  p.x += p.vx * dt; p.y += p.vy * dt;
+  collideTiles(p);
+  if (moving) { const ps = p.step; p.step += dt * spd / 55; if (Math.floor(ps / Math.PI) !== Math.floor(p.step / Math.PI)) sfx('step', 0.6); }
+  // つかむ（PC：長押し）
+  grabCd -= dt; relCd -= dt;
+  if (!isTouch || PAD.on) {
+    const h = myHold(), want = mouse.down || PAD.grab;
+    if (want && h == null && grabCd <= 0) { const id = findGrabV(); if (id != null) { sendGrab(id); grabCd = 0.25; } }
+    if (!want && h != null && relCd <= 0 && !(isTouch && touchHeld)) { sendRel(); relCd = 0.15; }
+    if (h == null && !want) ME.holdD = 0;
+  }
+}
+
+// ================= ネット =================
+let peerLoading = null;
+function loadPeer() {
+  if (window.Peer) return Promise.resolve(true);
+  if (!peerLoading) peerLoading = new Promise(res => {
+    const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js';
+    const to = setTimeout(() => res(false), 15000);
+    sc.onload = () => { clearTimeout(to); res(!!window.Peer); };
+    sc.onerror = () => { clearTimeout(to); peerLoading = null; res(false); };
+    document.head.appendChild(sc);
+  });
+  return peerLoading;
+}
+function netMsg(t, ms = 2500) { const el = $('netMsg'); el.textContent = t; el.style.display = t ? 'block' : 'none'; clearTimeout(netMsg.to); if (t && ms) netMsg.to = setTimeout(() => el.style.display = 'none', ms); }
+function myName() { const n = $('inName').value.trim().slice(0, 8) || '回収員'; store(NAME_KEY, n); return n; }
+function netSend(d) { try { NET.conn && NET.conn.open && NET.conn.send(d); } catch (e) {} }
+function bc(d) { for (const [, c] of NET.conns) { try { c.conn.open && c.conn.send(d); } catch (e) {} } }
+function setRoster() { ROSTER = [...PL.values()].map(p => ({ id: p.id, name: p.name, col: p.col, bot: p.bot ? 1 : 0, peer: p.peer })); bc({ t: 'roster', roster: ROSTER }); renderLobby(); voiceConnect(); updMicUI(); }
+// AI仲間を選択どおりに PL へ追加・削除（人間優先で6人まで）
+function syncBots() {
+  for (const p of [...PL.values()]) if (p.bot && !AI_SEL.includes(p.botKey)) PL.delete(p.id);
+  for (const key of AI_SEL) {
+    if ([...PL.values()].some(p => p.botKey === key)) continue;
+    if (PL.size >= 6) break;
+    const d = botDef(key); if (!d) continue;
+    const id = nextPid++, p = newPlayer(id, d.name);
+    p.bot = { t: 0 }; p.botKey = key; p.col = d.col;
+    PL.set(id, p);
+  }
+  setRoster();
+}
+function renderAiPick() {
+  for (const id of ['aiPick', 'aiPick2']) {
+    const el = $(id); if (!el) continue;
+    el.innerHTML = AI_BOTS.map(b => `<button class="ai${AI_SEL.includes(b.key) ? ' on' : ''}" data-k="${b.key}" style="${AI_SEL.includes(b.key) ? 'background:' + b.col : ''}">🤖 ${b.name}</button>`).join('');
+    for (const b of el.querySelectorAll('.ai')) b.onclick = () => {
+      const k = b.dataset.k;
+      AI_SEL = AI_SEL.includes(k) ? AI_SEL.filter(x => x !== k) : AI_SEL.concat(k).slice(0, 5);
+      try { localStorage.setItem('repoOriginalAI', JSON.stringify(AI_SEL)); } catch (e) {}
+      renderAiPick();
+      if (NET.mode === 'host' && !playing) syncBots();
+    };
+  }
+}
+let nextPid = 1;
+async function hostRoom() {
+  initAudio(); netMsg('🌐 オンラインの準備中…', 0);
+  if (!await loadPeer()) return netMsg('オンライン機能を読み込めませんでした（ネット接続を確認してね）');
+  leaveRoom(true);
+  const code = [...Array(5)].map(() => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.random() * 32 | 0]).join('');
+  const peer = new Peer('repoorig-' + code); NET.peer = peer;
+  peer.on('open', () => {
+    NET.mode = 'host'; NET.code = code; myId = 0; nextPid = 1; voiceListen(peer);
+    PL = new Map([[0, newPlayer(0, myName())]]); PL.get(0).peer = peer.id; syncBots();
+    netMsg('部屋を作りました：' + code); showScr('sLobby');
+  });
+  peer.on('connection', conn => {
+    const c = { conn, pid: -1 };
+    conn.on('data', d => hostRecv(c, d));
+    conn.on('close', () => hostDrop(c));
+    conn.on('error', () => hostDrop(c));
+  });
+  peer.on('error', err => { if (err.type === 'unavailable-id') { hostRoom(); return; } netMsg('オンラインのエラー：' + err.type); });
+}
+function hostRecv(c, d) {
+  if (!d || !d.t) return;
+  if (d.t === 'hello') {
+    if (PL.size >= 6) { const b = [...PL.values()].reverse().find(q => q.bot); if (b) { hostRelease(b); PL.delete(b.id); } }
+    if (PL.size >= 6) { try { c.conn.send({ t: 'full' }); } catch (e) {} return; }
+    const id = nextPid++; c.pid = id; NET.conns.set(c.conn.peer, c);
+    const p = newPlayer(id, String(d.name || 'ゲスト').slice(0, 8)); p.peer = c.conn.peer;
+    PL.set(id, p); setRoster();
+    try { c.conn.send({ t: 'welcome', you: id, code: NET.code, roster: ROSTER, run: RUN }); } catch (e) {}
+    if (playing && G && !G.ended) { // 途中参加：バスに出現
+      const s = spawnPos(PL.size - 1); Object.assign(p, { x: s.x, y: s.y, hp: maxHp(), sta: maxSta(), ammo: RUN.gun ? 5 : 0, shotCd: 0 });
+      sendStart(c);
+      ev('toast', p.name + ' が合流した', '#9fd3ff', 2.5, -1);
+    } else if (shownEnd) { try { c.conn.send({ t: 'shop', run: RUN }); } catch (e) {} }
+    netMsg('👋 ' + p.name + ' が部屋に入った');
+    return;
+  }
+  const p = PL.get(c.pid); if (!p) return;
+  switch (d.t) {
+    case 'p': {
+      if (p.dead) return;
+      const now = performance.now(), dtm = Math.max(0.02, (now - (p.lastT || now - 50)) / 1000);
+      const nx = +d.x, ny = +d.y; if (!isFinite(nx) || !isFinite(ny)) return;
+      p.vx = clamp((nx - p.x) / dtm, -500, 500); p.vy = clamp((ny - p.y) / dtm, -500, 500);
+      if (Math.hypot(nx - p.x, ny - p.y) > 200) { p.vx = p.vy = 0; }
+      { const ny2 = +d.yw || 0; p.yawRate = (p.yawRate || 0) * 0.5 + angDiff(ny2, p.yaw) / dtm * 0.5; }
+      p.x = nx; p.y = ny; p.yaw = +d.yw || 0; p.pitch = clamp(+d.pt || 0, -1.3, 1.3); p.sprint = !!d.sp; p.holdD = clamp(+d.hd || 0, -10, 70); p.z = clamp(+d.z || 0, 0, 2); p.crouch = !!d.cr; p.lastT = now;
+      break;
+    }
+    case 'grab': hostGrab(p, d.id | 0); break;
+    case 'rel': hostRelease(p); break;
+    case 'act': hostAct(p); break;
+    case 'heal': hostHeal(p); break;
+    case 'flash': hostFlash(p); break;
+    case 'shoot': p.yaw = +d.yw || p.yaw; hostShoot(p, p.yaw); break;
+    case 'buy': buy(d.id); break;
+    case 'talk': if (G && !p.dead) makeNoise(p.x, p.y, 260); break;
+  }
+}
+function hostDrop(c) {
+  if (!NET.conns.has(c.conn.peer)) return;
+  NET.conns.delete(c.conn.peer);
+  const p = PL.get(c.pid);
+  if (p) {
+    hostRelease(p); PL.delete(c.pid);
+    netMsg('👋 ' + p.name + ' が抜けた');
+    if (G && playing && !G.ended && !alive().length) { G.ended = true; const g0 = G; setTimeout(() => { if (G === g0) gameOver(); }, 1000); }
+  }
+  setRoster();
+}
+async function joinRoom() {
+  initAudio();
+  const code = $('inCode').value.trim().toUpperCase();
+  if (code.length < 4) return netMsg('部屋コードを入れてね');
+  netMsg('🌐 接続中…', 0);
+  if (!await loadPeer()) return netMsg('オンライン機能を読み込めませんでした（ネット接続を確認してね）');
+  leaveRoom(true);
+  const peer = new Peer(); NET.peer = peer; voiceListen(peer);
+  peer.on('open', () => {
+    const conn = peer.connect('repoorig-' + code, { reliable: true }); NET.conn = conn;
+    conn.on('open', () => { NET.mode = 'client'; NET.code = code; conn.send({ t: 'hello', name: myName() }); });
+    conn.on('data', clientRecv);
+    conn.on('close', () => { if (NET.mode === 'client') { leaveRoom(true); toTitle(); netMsg('ホストとの接続が切れました', 4000); } });
+  });
+  peer.on('error', err => netMsg(err.type === 'peer-unavailable' ? 'その部屋が見つかりません（コードを確認してね）' : 'オンラインのエラー：' + err.type));
+}
+function clientRecv(d) {
+  if (!d || !d.t) return;
+  switch (d.t) {
+    case 'full': netMsg('部屋が満員です（最大6人）', 4000); leaveRoom(true); break;
+    case 'welcome': myId = d.you; ROSTER = d.roster; RUN = d.run; netMsg('部屋に入りました！ 🎤ボタンで声を出せます'); showScr('sLobby'); renderLobby(); voiceConnect(); updMicUI(); break;
+    case 'roster': ROSTER = d.roster; renderLobby(); voiceConnect(); break;
+    case 'start':
+      RUN = d.run; ROSTER = d.roster; myId = d.you; G = null;
+      MAP = genMap(d.seed, d.lv);
+      ME = newPlayer(myId, nameOf(myId)); ME.x = d.sx; ME.y = d.sy; ME.hp = maxHp(); ME.sta = maxSta(); ME.hold = null;
+      GS.quota = quotaOf(d.lv); GS.sold = 0; GS.death = 0; GS.lv = d.lv;
+      enterLevel();
+      break;
+    case 's': if (V && MAP && playing) { applySnap(d, false); if (d.ev) for (const a of d.ev) handleEvent(a); } break;
+    case 'run': RUN = d.run; if ($('sShop').classList.contains('show')) renderShop(); break;
+    case 'clear': RUN = d.run; endLevelView(); $('clearStats').innerHTML = d.html; showScr('sClear'); break;
+    case 'shop': RUN = d.run; endLevelView(); openShop(); break;
+    case 'over': endLevelView(); $('overStats').innerHTML = d.html; $('bRetry').style.display = 'none'; showScr('sOver'); break;
+  }
+}
+// ---- マイク ----
+const VOICE = { on: false, mic: null, silent: null, an: null, calls: new Map(), level: 0, talkT: 0 };
+function silentStream() {
+  initAudio();
+  if (!VOICE.silent && AC) { const d = AC.createMediaStreamDestination(), o = AC.createOscillator(), gg = AC.createGain(); gg.gain.value = 0; o.connect(gg).connect(d); o.start(); VOICE.silent = d.stream; }
+  return VOICE.silent;
+}
+const outStream = () => (VOICE.on && VOICE.mic ? VOICE.mic : silentStream());
+function swapTracks() {
+  const s0 = outStream(); const tr = s0 && s0.getAudioTracks()[0]; if (!tr) return;
+  for (const v of VOICE.calls.values()) { try { for (const sd of v.call.peerConnection.getSenders()) if (!sd.track || sd.track.kind === 'audio') sd.replaceTrack(tr); } catch (e) {} }
+}
+function updMicUI() { const b = $('bMic'); b.classList.toggle('on', !!NET.mode); b.classList.toggle('live', VOICE.on); b.textContent = VOICE.on ? '🎤 ON' : '🎤 OFF'; }
+async function toggleMic() {
+  initAudio();
+  if (!NET.mode) return toastLocal('マイクはオンラインの部屋で使えます', '#ff8a80', 2);
+  if (VOICE.on) { VOICE.on = false; if (VOICE.mic) VOICE.mic.getTracks().forEach(t => t.stop()); VOICE.mic = null; VOICE.an = null; swapTracks(); updMicUI(); return; }
+  try { VOICE.mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
+  catch (e) { return netMsg('マイクを使えませんでした（ブラウザのマイク許可を確認してね）', 4000); }
+  VOICE.on = true;
+  try { const src = AC.createMediaStreamSource(VOICE.mic); VOICE.an = AC.createAnalyser(); VOICE.an.fftSize = 512; src.connect(VOICE.an); } catch (e) {}
+  swapTracks(); updMicUI(); netMsg('🎤 マイクON：近くの仲間に声が届きます（話し声で敵に気づかれることも）');
+}
+function levelOf(an) { if (!an) return 0; const a = new Uint8Array(an.fftSize); an.getByteTimeDomainData(a); let s = 0; for (const v of a) { const d = (v - 128) / 128; s += d * d; } return Math.sqrt(s / a.length); }
+function setupCall(call, pid) {
+  const key = call.connectionId || (call.peer + ':' + pid), v = { call, pid, gain: null, an: null, el: null, level: 0 };
+  for (const [k2, o] of VOICE.calls) if (o.pid === pid) { try { o.call.close(); o.gain && o.gain.disconnect(); } catch (e) {} VOICE.calls.delete(k2); } // 同じ相手との古い回線は閉じる
+  VOICE.calls.set(key, v);
+  call.on('stream', rs => {
+    initAudio(); if (!AC || v.gain) return;
+    const el = new Audio(); el.srcObject = rs; el.muted = true; el.play().catch(() => {}); v.el = el; // Chrome はこれが無いと音が流れない
+    const src = AC.createMediaStreamSource(rs); v.gain = AC.createGain(); v.an = AC.createAnalyser(); v.an.fftSize = 512;
+    src.connect(v.an); src.connect(v.gain).connect(AC.destination);
+  });
+  const end = () => { VOICE.calls.delete(key); try { v.gain && v.gain.disconnect(); } catch (e) {} };
+  call.on('close', end); call.on('error', end);
+}
+function voiceListen(peer) { peer.on('call', call => { const pid = call.metadata && call.metadata.pid; try { call.answer(outStream()); } catch (e) { return; } setupCall(call, pid); }); }
+function voiceConnect() { // 後から入った人が、先にいる人（IDが小さい人）に電話をかける
+  if (!NET.peer || !NET.mode) return;
+  for (const r of ROSTER) {
+    if (r.bot || !r.peer || r.id >= myId) continue;
+    if ([...VOICE.calls.values()].some(v => v.pid === r.id)) continue;
+    const st = outStream(); if (!st) continue;
+    try { const call = NET.peer.call(r.peer, st, { metadata: { pid: myId } }); if (call) setupCall(call, r.id); } catch (e) {}
+  }
+}
+function voiceTick(dt) {
+  VOICE.level = VOICE.on ? levelOf(VOICE.an) : 0;
+  $('bMic').classList.toggle('talk', VOICE.level > 0.04);
+  for (const v of VOICE.calls.values()) {
+    v.level = levelOf(v.an);
+    if (!v.gain) continue;
+    let g = 1;
+    if (playing && V && ME) { const pv = V.players.get(v.pid); if (pv) { const d = Math.hypot(pv.cx - ME.x, pv.cy - ME.y); g = clamp(1.15 - d / 850, 0, 1); } }
+    v.gain.gain.value = g;
+  }
+  // 大きな声は敵に聞こえる
+  VOICE.talkT -= dt;
+  if (playing && VOICE.level > 0.08 && VOICE.talkT <= 0 && ME && !ME.dead) { VOICE.talkT = 1; if (isClient()) netSend({ t: 'talk' }); else if (G) makeNoise(ME.x, ME.y, 260); }
+}
+const speaking = pid => { if (pid === myId) return VOICE.level > 0.04; for (const v of VOICE.calls.values()) if (v.pid === pid && v.level > 0.04) return true; return false; };
+function leaveRoom(silent) {
+  for (const v of VOICE.calls.values()) { try { v.call.close(); } catch (e) {} }
+  VOICE.calls.clear();
+  if (VOICE.mic) VOICE.mic.getTracks().forEach(t => t.stop()); VOICE.mic = null; VOICE.on = false; VOICE.an = null;
+  try { NET.peer && NET.peer.destroy(); } catch (e) {}
+  NET.peer = null; NET.conn = null; NET.conns.clear(); NET.mode = null; NET.code = '';
+  if (!silent) netMsg('部屋を出ました');
+}
+function renderLobby() {
+  if (!NET.mode) return;
+  $('lbCode').textContent = NET.code;
+  $('lbList').innerHTML = ROSTER.map(r => `<div class="mem"><i style="background:${r.col || PCOL[r.id % 6]}"></i><b>${r.bot ? '🤖 ' : ''}${esc(r.name)}</b>${r.id === 0 ? '<small>（ホスト）</small>' : ''}${r.id === myId ? '<small>（あなた）</small>' : ''}</div>`).join('');
+  const host = NET.mode === 'host', sv = load(SAVE_KEY);
+  $('lbInfo').textContent = host ? `友達にこのコードを教えてね（${ROSTER.length}/6人）。途中からの合流もOK` : 'ホストの出発を待っています…';
+  $('bLbNew').style.display = host ? 'block' : 'none';
+  $('bLbCont').style.display = host && sv ? 'block' : 'none';
+  $('lbAi').style.display = host ? 'block' : 'none';
+  if (sv) $('bLbCont').textContent = `みんなで つづきから（現場 Lv.${sv.level}）`;
+}
+function netTick(dt) {
+  if (!playing) return;
+  if (isClient()) {
+    NET.sendAcc += dt;
+    if (NET.sendAcc >= 0.05 && ME && !ME.dead) { NET.sendAcc = 0; netSend({ t: 'p', x: Math.round(ME.x * 10) / 10, y: Math.round(ME.y * 10) / 10, yw: +ME.yaw.toFixed(3), pt: +ME.pitch.toFixed(3), sp: ME.sprint ? 1 : 0, hd: Math.round(ME.holdD || 0), z: +ME.z.toFixed(2), cr: ME.crouch ? 1 : 0 }); }
+    return;
+  }
+  NET.acc += dt;
+  if (NET.acc < 1 / 15) return;
+  NET.acc = 0;
+  if (!G) return;
+  if (NET.conns.size) { const s = makeSnap(); s.ev = G.ev; bc(s); }
+  G.ev = [];
+}
+
+// ================= 画面遷移 =================
+let shownEnd = false;
+const anyScr = () => [...document.querySelectorAll('.scr')].some(s => s.classList.contains('show'));
+function showScr(id) {
+  for (const s of document.querySelectorAll('.scr')) s.classList.toggle('show', s.id === id);
+  $('touch').classList.toggle('on', !id && playing && isTouch);
+  $('bFull').classList.toggle('on', !id && playing);
+  updMicUI();
+  $('bShoot').style.display = RUN.gun ? 'flex' : 'none';
+  $('chat').style.display = !id && playing ? 'block' : 'none';
+  if (id && locked) { try { document.exitPointerLock(); } catch (e) {} }
+  if (G && !NET.mode) G.paused = !!id;
+}
+function endLevelView() { playing = false; shownEnd = true; touches.move = touches.look = null; updStickUI(); }
+function statsHtml(rows) { return rows.map(([a, b]) => `<div class="stat"><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join(''); }
+function levelClear() {
+  if (G.ended) return;
+  G.ended = true;
+  for (const p of PL.values()) hostRelease(p);
+  const surplus = Math.max(0, G.sold - G.quota), bonus = Math.round(surplus * 0.1 / 10) * 10;
+  RUN.money += bonus; RUN.total += bonus;
+  const html = statsHtml([['現場', 'Lv.' + MAP.lv], ['納品額', yen(G.sold)], ['ノルマ', yen(G.quota)], ['超過ボーナス (10%)', '+' + yen(bonus)],
+    ['壊したお宝', G.broken + '個'], ['倒したモンスター', G.kills + '体'], ['生存', alive().length + '/' + PL.size + '人'], ['チームの所持金', yen(RUN.money)]]);
+  const best = load(BEST_KEY) || 0; if (MAP.lv > best) store(BEST_KEY, MAP.lv);
+  RUN.level++; store(SAVE_KEY, RUN);
+  bc({ t: 'clear', html, run: RUN });
+  endLevelView(); $('clearStats').innerHTML = html; showScr('sClear');
+}
+function gameOver() {
+  const html = statsHtml([['到達した現場', 'Lv.' + MAP.lv], ['この現場の納品額', yen(G.sold) + ' / ' + yen(G.quota)], ['これまでの総収入', yen(RUN.total)], ['失った所持金', yen(RUN.money)]]);
+  const best = load(BEST_KEY) || 0; if (MAP.lv - 1 > best) store(BEST_KEY, MAP.lv - 1);
+  store(SAVE_KEY, null);
+  bc({ t: 'over', html });
+  endLevelView(); $('overStats').innerHTML = html; $('bRetry').style.display = 'block'; showScr('sOver');
+}
+function price(s) { if (s.k === 'gun') return s.base; const lv = s.k === 'up' ? (RUN.up[s.id] || 0) : 0; return Math.round(s.base * (1 + 0.6 * lv) * (s.k === 'inv' ? 1 + 0.1 * (RUN.level - 1) : 1) / 50) * 50; }
+function buy(id) {
+  const s = SHOP.find(x => x.id === id); if (!s) return;
+  const pr = price(s); if (RUN.money < pr || (s.max && (RUN.up[s.id] || 0) >= s.max) || (s.k === 'gun' && RUN.gun)) return;
+  RUN.money -= pr;
+  if (s.k === 'gun') RUN.gun = true; else if (s.k === 'up') RUN.up[s.id] = (RUN.up[s.id] || 0) + 1; else RUN.inv[s.id]++;
+  store(SAVE_KEY, RUN); bc({ t: 'run', run: RUN });
+  sfx('sell'); if ($('sShop').classList.contains('show')) renderShop();
+}
+function renderShop() {
+  $('shopMoney').textContent = 'チームの所持金 ' + yen(RUN.money);
+  $('shopNext').textContent = `次の現場：Lv.${RUN.level}「${stageOf(RUN.level).n}」　ノルマ ${yen(quotaOf(RUN.level))}` + (NET.mode ? '（強化はチーム全員に効く）' : '');
+  $('shopList').innerHTML = SHOP.map(s => {
+    const pr = price(s), mx = (s.max && (RUN.up[s.id] || 0) >= s.max) || (s.k === 'gun' && RUN.gun), own = s.k === 'gun' ? (RUN.gun ? '所持' : '未所持') : s.k === 'up' ? `Lv.${RUN.up[s.id] || 0}${s.max ? ' / ' + s.max : ''}` : `所持 ${RUN.inv[s.id]}`;
+    return `<div class="si"><div class="ic">${s.ic}</div><div class="t"><b>${s.n}　<small>${own}</small></b>${s.d}</div><button data-id="${s.id}" ${mx || RUN.money < pr ? 'disabled' : ''}>${mx ? (s.k === 'gun' ? '購入済み' : 'MAX') : yen(pr)}</button></div>`;
+  }).join('');
+  for (const b of $('shopList').querySelectorAll('button')) b.onclick = () => { initAudio(); if (isClient()) netSend({ t: 'buy', id: b.dataset.id }); else buy(b.dataset.id); };
+  const cl = isClient();
+  $('bGo').disabled = cl; $('bGo').textContent = cl ? 'ホストの出発を待っています…' : '次の現場へ出発';
+  $('bToTitle').textContent = NET.mode ? '部屋を抜けてタイトルへ' : 'タイトルへ（自動セーブ済み）';
+}
+function openShop() { renderShop(); showScr('sShop'); }
+function openMenu() {
+  if (!playing) return;
+  $('pauseInfo').textContent = NET.mode ? 'オンライン中はゲームが止まりません' : 'ポーズ中';
+  $('bQuit').textContent = NET.mode ? '部屋を抜けてタイトルへ' : 'タイトルへ（この現場は失敗扱い）';
+  showScr('sPause');
+}
+function toTitle() {
+  playing = false; G = null; V = null; ME = null; MAP = null; clearWorld();
+  const sv = load(SAVE_KEY), best = load(BEST_KEY);
+  $('bCont').style.display = sv ? 'block' : 'none';
+  if (sv) $('bCont').textContent = `ひとりで つづきから（現場 Lv.${sv.level}・${yen(sv.money)}）`;
+  $('bestTxt').textContent = best ? `最高記録：現場 Lv.${best} クリア` : '';
+  showScr('sTitle');
+}
+function startSolo(cont) {
+  initAudio(); leaveRoom(true);
+  RUN = cont ? Object.assign(newRun(), load(SAVE_KEY)) : newRun();
+  store(SAVE_KEY, RUN);
+  myId = 0; nextPid = 1; PL = new Map([[0, newPlayer(0, myName())]]); syncBots();
+  if (cont) openShop(); else hostStartLevel();
+}
+$('inName').value = load(NAME_KEY) || '';
+renderAiPick();
+$('bSolo').onclick = () => startSolo(false);
+$('bCont').onclick = () => startSolo(true);
+$('bHost').onclick = () => hostRoom();
+$('bJoin').onclick = () => joinRoom();
+$('inCode').addEventListener('keydown', e => { if (e.key === 'Enter') joinRoom(); });
+$('bLbNew').onclick = () => { initAudio(); RUN = newRun(); store(SAVE_KEY, RUN); hostStartLevel(); };
+$('bLbCont').onclick = () => { initAudio(); RUN = Object.assign(newRun(), load(SAVE_KEY)); bc({ t: 'shop', run: RUN }); shownEnd = true; openShop(); };
+$('bLbLeave').onclick = () => { leaveRoom(); toTitle(); updMicUI(); };
+$('bMic').addEventListener('pointerdown', e => { e.stopPropagation(); e.preventDefault(); toggleMic(); });
+$('bGo').onclick = () => { if (isClient()) return; initAudio(); store(SAVE_KEY, RUN); hostStartLevel(); };
+$('bToTitle').onclick = () => { if (!isClient()) store(SAVE_KEY, RUN); leaveRoom(true); toTitle(); };
+$('bShop').onclick = () => openShop();
+$('bRetry').onclick = () => { initAudio(); RUN = newRun(); store(SAVE_KEY, RUN); hostStartLevel(); };
+$('bOverTitle').onclick = () => { leaveRoom(true); toTitle(); };
+$('bResume').onclick = () => { showScr(null); if (!isTouch) { try { const r = gl.requestPointerLock(); if (r && r.catch) r.catch(() => {}); } catch (e) {} } };
+$('bQuit').onclick = () => { if (!NET.mode) store(SAVE_KEY, RUN); leaveRoom(true); toTitle(); };
+document.addEventListener('visibilitychange', () => { if (document.hidden && playing && !NET.mode && !anyScr()) openMenu(); });
+if (IS_MOBILE) $('ctrlPC').style.display = 'none';
+
+// ================= 3D描画 =================
+const renderer = new THREE.WebGLRenderer({ canvas: gl, antialias: !IS_MOBILE });
+renderer.setClearColor(0x000000);
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x000000, 4, 34);
+const camera = new THREE.PerspectiveCamera(72, 1, 0.05, 80);
+camera.rotation.order = 'YXZ';
+scene.add(camera);
+const ambient = new THREE.AmbientLight(0x7a7a90, 0.4);
+scene.add(ambient);
+const SPOTS = [];
+for (let i = 0; i < 6; i++) {
+  const s = new THREE.SpotLight(0xfff2d8, 0, 16, 0.72, 0.5, 1.1);
+  scene.add(s); scene.add(s.target); SPOTS.push(s);
+}
+const POINTS = [];
+for (let i = 0; i < (IS_MOBILE ? 6 : 9); i++) { const l = new THREE.PointLight(0xffe2b0, 0, 10, 1.4); scene.add(l); POINTS.push(l); }
+let world = null;
+const MESH = { items: new Map(), mons: new Map(), players: new Map(), carts: [] };
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  VW = innerWidth; VH = innerHeight;
+  renderer.setPixelRatio(Math.min(DPR, IS_MOBILE ? 1 : 1.5));
+  renderer.setSize(Math.max(1, VW), Math.max(1, VH), false);
+  camera.aspect = Math.max(1, VW) / Math.max(1, VH); camera.updateProjectionMatrix();
+  hud.width = Math.max(1, Math.round(VW * DPR)); hud.height = Math.max(1, Math.round(VH * DPR));
+}
+addEventListener('resize', resize); resize();
+
+const PAL = [['#3b3027', '#33291f'], ['#2f3439', '#283035'], ['#3a2f33', '#31272b'], ['#2d3329', '#262c23'], ['#38342a', '#2f2b22']];
+const WALLTINT = ['#b8a58f', '#9aa5ad', '#b39aa1', '#9fab95', '#b2a88f'];
+function floorCanvas(M) {
+  const P = 32, { W, H, g, roomOf, rooms } = M, ST = M.stage;
+  const c = document.createElement('canvas'); c.width = W * P; c.height = H * P;
+  const x = c.getContext('2d');
+  x.fillStyle = '#111'; x.fillRect(0, 0, c.width, c.height);
+  const R = mulberry(M.seed + 7);
+  for (let ty = 0; ty < H; ty++) for (let tx = 0; tx < W; tx++) {
+    if (g[ty * W + tx] === 1) continue;
+    const rid = roomOf[ty * W + tx], px = tx * P, py = ty * P;
+    if (rid === 0) { x.fillStyle = '#4a525c'; x.fillRect(px, py, P, P); x.fillStyle = '#5a636e'; for (let k = 4; k < P; k += 8) x.fillRect(px, py + k, P, 2); }
+    else if (rid > 0) {
+      const st = rooms[rid].style, pl = ST.pal[st % ST.pal.length];
+      if (st === 0 || st === 4) { x.fillStyle = pl[0]; x.fillRect(px, py, P, P); x.fillStyle = pl[1]; for (let k = 0; k < P; k += 8) x.fillRect(px, py + k, P, 1); x.fillRect(px + ((ty * 17) % 4) * 8, py, 1, P); }
+      else if (st === 1) { x.fillStyle = (tx + ty) % 2 ? pl[0] : pl[1]; x.fillRect(px, py, P, P); x.strokeStyle = 'rgba(0,0,0,.3)'; x.strokeRect(px + .5, py + .5, P - 1, P - 1); }
+      else { x.fillStyle = pl[0]; x.fillRect(px, py, P, P); x.fillStyle = 'rgba(0,0,0,.15)'; for (let k = 0; k < 5; k++) x.fillRect(px + R() * P, py + R() * P, 2, 2); }
+    } else { x.fillStyle = ST.hall; x.fillRect(px, py, P, P); x.fillStyle = 'rgba(255,255,255,.04)'; x.fillRect(px + R() * P, py + R() * P, 5, 2); }
+  }
+  for (let k = 0; k < W * H / 12; k++) {
+    const tx = Math.floor(R() * W), ty = Math.floor(R() * H);
+    if (g[ty * W + tx] !== 0 || roomOf[ty * W + tx] === 0) continue;
+    x.fillStyle = R() < 0.5 ? 'rgba(0,0,0,.3)' : 'rgba(70,40,20,.3)';
+    x.beginPath(); x.ellipse(tx * P + R() * P, ty * P + R() * P, 3 + R() * 10, 2 + R() * 7, R() * 3, 0, 7); x.fill();
+  }
+  for (let ty = 0; ty < H; ty++) for (let tx = 0; tx < W; tx++) { // 穴
+    if (g[ty * W + tx] !== 2) continue;
+    const px = tx * P, py = ty * P;
+    x.fillStyle = '#000'; x.fillRect(px, py, P, P);
+    x.fillStyle = '#ffcc22';
+    for (const [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) { if (g[(ty + dy) * W + tx + dx] === 2) continue; for (let k = 0; k < P; k += 8) { if (dy) x.fillRect(px + k, dy < 0 ? py : py + P - 3, 4, 3); else x.fillRect(dx < 0 ? px : px + P - 3, py + k, 3, 4); } }
+  }
+  for (const d of M.desks) {
+    const z = d.zone, s = P / T;
+    x.fillStyle = 'rgba(255,216,77,.18)'; x.fillRect(z.x * s, z.y * s, z.w * s, z.h * s);
+    x.strokeStyle = '#ffd84d'; x.lineWidth = 3; x.setLineDash([8, 6]); x.strokeRect(z.x * s + 3, z.y * s + 3, z.w * s - 6, z.h * s - 6); x.setLineDash([]);
+    x.fillStyle = 'rgba(255,216,77,.8)'; x.font = '800 13px sans-serif'; x.textAlign = 'center'; x.fillText('納品エリア', (z.x + z.w / 2) * s, (z.y + z.h / 2) * s + 5);
+  }
+  const r0 = M.rooms[0];
+  x.strokeStyle = '#7ad48a'; x.lineWidth = 3; x.setLineDash([8, 6]); x.strokeRect(r0.x * P + 4, r0.y * P + 4, r0.w * P - 8, r0.h * P - 8); x.setLineDash([]);
+  x.fillStyle = 'rgba(122,212,138,.6)'; x.font = '800 20px sans-serif'; x.textAlign = 'center'; x.fillText('BUS', r0.cx / T * P, (r0.y + r0.h) * P - 14);
+  return c;
+}
+let wallTex = null;
+function makeWallTex() {
+  const c = document.createElement('canvas'); c.width = 128; c.height = 192;
+  const x = c.getContext('2d');
+  x.fillStyle = '#8a8378'; x.fillRect(0, 0, 128, 192);
+  for (let i = 0; i < 128; i += 16) { x.fillStyle = i % 32 ? 'rgba(0,0,0,.06)' : 'rgba(255,255,255,.05)'; x.fillRect(i, 0, 8, 192); }
+  x.fillStyle = '#3a2f25'; x.fillRect(0, 176, 128, 16);
+  x.fillStyle = '#5a4a3a'; x.fillRect(0, 100, 128, 6);
+  for (let k = 0; k < 14; k++) { x.fillStyle = `rgba(40,30,15,${Math.random() * 0.25})`; x.beginPath(); x.ellipse(Math.random() * 128, Math.random() * 190, 4 + Math.random() * 18, 6 + Math.random() * 30, 0, 0, 7); x.fill(); }
+  const t = new THREE.CanvasTexture(c); t.userData = { shared: 1 }; return t;
+}
+const emojiTexCache = {};
+function emojiTex(e) {
+  if (emojiTexCache[e]) return emojiTexCache[e];
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const x = c.getContext('2d');
+  x.font = '84px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.shadowColor = 'rgba(255,216,77,1)'; x.shadowBlur = 18; x.fillText(e, 64, 70); x.shadowBlur = 8; x.fillText(e, 64, 70);
+  const t = new THREE.CanvasTexture(c); t.userData = { shared: 1 };
+  return emojiTexCache[e] = t;
+}
+function textSprite(text, col) {
+  const c = document.createElement('canvas'); c.width = 256; c.height = 64;
+  const x = c.getContext('2d');
+  x.font = '800 30px "M PLUS Rounded 1c",sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.lineWidth = 6; x.strokeStyle = 'rgba(0,0,0,.8)'; x.strokeText(text, 128, 32); x.fillStyle = col; x.fillText(text, 128, 32);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), fog: false, transparent: true }));
+  s.scale.set(1.6, 0.4, 1); return s;
+}
+const GEO = {}, MAT = {};
+function geo(k, f) { if (!GEO[k]) { GEO[k] = f(); GEO[k].userData = { shared: 1 }; } return GEO[k]; }
+function mat(k, f) { if (!MAT[k]) { MAT[k] = f(); MAT[k].userData = { shared: 1 }; } return MAT[k]; }
+function clearWorld() {
+  if (!world) return;
+  scene.remove(world);
+  world.traverse(o => {
+    if (o.geometry && !(o.geometry.userData && o.geometry.userData.shared)) o.geometry.dispose();
+    const ms = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : [];
+    for (const m of ms) { if (m.userData && m.userData.shared) continue; if (m.map && !(m.map.userData && m.map.userData.shared)) m.map.dispose(); m.dispose(); }
+  });
+  world = null;
+  MESH.items.clear(); MESH.mons.clear(); MESH.players.clear(); MESH.carts = [];
+  for (const s of SPOTS) s.intensity = 0;
+  for (const l of POINTS) l.intensity = 0;
+  for (const b of BEAMS) b.core.visible = b.glow.visible = b.tip.visible = false;
+}
+let LIGHTSRC = [];
+const MM = { s: 1, cv: null, x: null, seen: null };
+function buildWorld(M) {
+  clearWorld();
+  world = new THREE.Group(); scene.add(world);
+  const W = M.W, H = M.H;
+  const ft = new THREE.CanvasTexture(floorCanvas(M)); ft.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(W * TS, H * TS), new THREE.MeshPhongMaterial({ map: ft, shininess: 6 }));
+  floor.rotation.x = -Math.PI / 2; floor.position.set(W * TS / 2, 0, H * TS / 2); world.add(floor);
+  const ceil = new THREE.Mesh(new THREE.PlaneGeometry(W * TS, H * TS), new THREE.MeshPhongMaterial({ color: 0x1c1a1f, shininess: 0 }));
+  ceil.rotation.x = Math.PI / 2; ceil.position.set(W * TS / 2, WALL_H, H * TS / 2); world.add(ceil);
+  if (!wallTex) wallTex = makeWallTex();
+  const list = [];
+  for (let ty = 0; ty < H; ty++) for (let tx = 0; tx < W; tx++) {
+    if (M.g[ty * W + tx] !== 1) continue;
+    let tint = null;
+    for (const [dx, dy] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
+      const nx = tx + dx, ny = ty + dy;
+      if (nx < 0 || ny < 0 || nx >= W || ny >= H || M.g[ny * W + nx] === 1) continue;
+      const rid = M.roomOf[ny * W + nx];
+      tint = rid === 0 ? '#8d98a6' : rid > 0 ? M.stage.wall[M.rooms[rid].style % M.stage.wall.length] : '#7d7a76';
+    }
+    if (tint) list.push([tx, ty, tint]);
+  }
+  const wm = new THREE.InstancedMesh(new THREE.BoxGeometry(TS, WALL_H, TS), new THREE.MeshPhongMaterial({ map: wallTex, shininess: 4 }), list.length);
+  const mtx = new THREE.Matrix4(), col = new THREE.Color();
+  list.forEach(([tx, ty, tint], i) => { mtx.makeTranslation((tx + 0.5) * TS, WALL_H / 2, (ty + 0.5) * TS); wm.setMatrixAt(i, mtx); wm.setColorAt(i, col.set(tint)); });
+  world.add(wm);
+  LIGHTSRC = [];
+  const lampGeo = geo('lamp', () => new THREE.BoxGeometry(0.9, 0.08, 0.9));
+  for (const r of M.rooms) {
+    if (!r.light) continue;
+    const lamp = new THREE.Mesh(lampGeo, new THREE.MeshBasicMaterial({ color: r.id ? 0xfff0c8 : 0xd8ffe0 }));
+    lamp.position.set(r.cx * SC, WALL_H - 0.05, r.cy * SC); world.add(lamp); r.lamp = lamp;
+    LIGHTSRC.push({ kind: r.id ? 'room' : 'truck', room: r, x: r.cx, y: r.cy, h: WALL_H - 0.4, dist: Math.max(r.w, r.h) * TS * 0.95, col: r.id ? 0xffe2b0 : 0xd0ffe0 });
+  }
+  const hallGeo = geo('hlamp', () => new THREE.BoxGeometry(0.5, 0.06, 0.5));
+  for (let ty = 1; ty < H - 1; ty++) for (let tx = 1; tx < W - 1; tx++) {
+    if (M.g[ty * W + tx] || M.roomOf[ty * W + tx] >= 0 || (tx * 7 + ty * 13) % 7) continue;
+    const lamp = new THREE.Mesh(hallGeo, new THREE.MeshBasicMaterial({ color: 0xffe6b0 }));
+    lamp.position.set((tx + 0.5) * TS, WALL_H - 0.04, (ty + 0.5) * TS); world.add(lamp);
+    LIGHTSRC.push({ kind: 'hall', lamp, x: (tx + 0.5) * T, y: (ty + 0.5) * T, h: WALL_H - 0.3, dist: 7, col: 0xffdca0 });
+  }
+  { // バスの座席
+    const r0 = M.rooms[0], seat = phong(0x2f5fa8, { shininess: 10 }), frame = phong(0x777777);
+    for (const side of [0, 1]) for (let k = 1; k < r0.h - 1; k++) {
+      const x = side ? (r0.x + r0.w) * TS - 0.45 : r0.x * TS + 0.45, z = (r0.y + k + 0.5) * TS, dir = side ? 1 : -1;
+      const g = new THREE.Group(); g.position.set(x, 0, z); world.add(g);
+      const a = new THREE.Mesh(geo('seat', () => new THREE.BoxGeometry(0.7, 0.18, 1.3)), seat); a.position.y = 0.5; g.add(a);
+      const b = new THREE.Mesh(geo('seatb', () => new THREE.BoxGeometry(0.16, 0.7, 1.3)), seat); b.position.set(dir * 0.3, 0.9, 0); g.add(b);
+      const l = new THREE.Mesh(geo('seatl', () => new THREE.BoxGeometry(0.08, 0.42, 1.0)), frame); l.position.y = 0.2; g.add(l);
+    }
+  }
+  for (const f of M.furn) world.add(makeFurniture(f));
+  for (const cells of M.pits || []) for (const [cx, cy] of cells) { // 穴の底（深く見せる）
+    const pit = new THREE.Mesh(geo('pitbox', () => new THREE.BoxGeometry(TS, 6, TS)), mat('pitmat', () => new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.BackSide })));
+    pit.position.set((cx + 0.5) * TS, -3, (cy + 0.5) * TS); world.add(pit);
+  }
+  const mon = M.truck.mon;
+  const mbox = new THREE.Mesh(geo('mbox', () => new THREE.BoxGeometry(1.2, 0.8, 0.15)), mat('dark', () => new THREE.MeshLambertMaterial({ color: 0x1d2a22 })));
+  mbox.position.set(mon.x * SC, 1.4, mon.y * SC - 0.5); world.add(mbox);
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.6), new THREE.MeshBasicMaterial({ color: 0x3a5a44, fog: false }));
+  scr.position.set(mon.x * SC, 1.4, mon.y * SC - 0.42); world.add(scr); world.userData.screen = scr;
+  for (const d of M.desks) {
+    const ped = new THREE.Mesh(geo('ped', () => new THREE.BoxGeometry(0.7, 1.0, 0.7)), mat('ped', () => new THREE.MeshLambertMaterial({ color: 0x3a3a3e })));
+    ped.position.set(d.btn.x * SC, 0.5, d.btn.y * SC); world.add(ped);
+    const btn = new THREE.Mesh(geo('btn', () => new THREE.CylinderGeometry(0.22, 0.24, 0.12, 20)), new THREE.MeshBasicMaterial({ color: 0xe5332a }));
+    btn.position.set(d.btn.x * SC, 1.06, d.btn.y * SC); world.add(btn); d.btnMesh = btn;
+    const glow = new THREE.Mesh(new THREE.PlaneGeometry(d.zone.w * SC, d.zone.h * SC), new THREE.MeshBasicMaterial({ color: 0xffd84d, transparent: true, opacity: 0.1, depthWrite: false, fog: false }));
+    glow.rotation.x = -Math.PI / 2; glow.position.set((d.zone.x + d.zone.w / 2) * SC, 0.02, (d.zone.y + d.zone.h / 2) * SC); world.add(glow); d.glowMesh = glow;
+    LIGHTSRC.push({ kind: 'desk', x: d.btn.x, y: d.btn.y, h: 2.2, dist: 7, col: 0xffd070 });
+    { // 天井から降りてくる回収ボックス
+      const bw = d.zone.w * SC, bd = d.zone.h * SC, bh = 1.3, g = new THREE.Group();
+      const stripe = canvasTex(128, 16, (x, w, h) => { x.fillStyle = '#ffcc22'; x.fillRect(0, 0, w, h); x.fillStyle = '#111'; for (let i = -2; i < 12; i++) { x.beginPath(); x.moveTo(i * 12, h); x.lineTo(i * 12 + 6, h); x.lineTo(i * 12 + 14, 0); x.lineTo(i * 12 + 8, 0); x.fill(); } });
+      stripe.wrapS = THREE.RepeatWrapping; stripe.repeat.set(4, 1);
+      const body = new THREE.Mesh(new THREE.BoxGeometry(bw + 0.2, bh, bd + 0.2), phong(0x3d434c, { shininess: 60 })); g.add(body);
+      const band = new THREE.Mesh(new THREE.BoxGeometry(bw + 0.26, 0.24, bd + 0.26), new THREE.MeshPhongMaterial({ map: stripe })); band.position.y = -bh / 2 + 0.16; g.add(band);
+      const mouth = new THREE.Mesh(new THREE.PlaneGeometry(bw, bd), new THREE.MeshBasicMaterial({ color: 0xffe066, transparent: true, opacity: 0.0, side: THREE.DoubleSide })); mouth.rotation.x = Math.PI / 2; mouth.position.y = -bh / 2 - 0.01; g.add(mouth);
+      for (const [cx, cz] of [[-bw / 2 + 0.2, -bd / 2 + 0.2], [bw / 2 - 0.2, -bd / 2 + 0.2], [-bw / 2 + 0.2, bd / 2 - 0.2], [bw / 2 - 0.2, bd / 2 - 0.2]]) { const cb = new THREE.Mesh(geo('cable', () => new THREE.CylinderGeometry(0.03, 0.03, 3, 6)), phong(0x222222)); cb.position.set(cx, bh / 2 + 1.5, cz); g.add(cb); }
+      const col = new THREE.Mesh(new THREE.BoxGeometry(bw, 1, bd), new THREE.MeshBasicMaterial({ color: 0xfff2a0, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+      world.add(col);
+      g.position.set((d.zone.x + d.zone.w / 2) * SC, WALL_H + 0.8, (d.zone.y + d.zone.h / 2) * SC); world.add(g);
+      d.box = { g, mouth, col, bh };
+    }
+  }
+  const s = Math.max(1, Math.floor(150 / W));
+  MM.s = s; MM.cv = document.createElement('canvas'); MM.cv.width = W * s; MM.cv.height = H * s; MM.x = MM.cv.getContext('2d'); MM.seen = new Uint8Array(W * H);
+}
+function makeAvatar(id) {
+  const g = new THREE.Group(), c = colOf(id);
+  const pm = mat('p' + c, () => new THREE.MeshLambertMaterial({ color: c }));
+  const body = new THREE.Mesh(geo('pbody', () => new THREE.CylinderGeometry(0.28, 0.32, 1.1, 14)), pm); body.position.y = 0.75; g.add(body);
+  const head = new THREE.Mesh(geo('phead', () => new THREE.SphereGeometry(0.27, 16, 12)), pm); head.position.y = 1.5; g.add(head);
+  const visor = new THREE.Mesh(geo('pvisor', () => new THREE.BoxGeometry(0.34, 0.14, 0.1)), mat('visor', () => new THREE.MeshBasicMaterial({ color: 0x8fe3ff }))); visor.position.set(0, 1.53, -0.24); g.add(visor);
+  const pack = new THREE.Mesh(geo('ppack', () => new THREE.BoxGeometry(0.4, 0.5, 0.2)), mat('dark2', () => new THREE.MeshLambertMaterial({ color: 0x333333 }))); pack.position.set(0, 0.95, 0.32); g.add(pack);
+  const lamp = new THREE.Mesh(geo('plamp', () => new THREE.SphereGeometry(0.06, 8, 6)), mat('plamp', () => new THREE.MeshBasicMaterial({ color: 0xfff6d0, fog: false }))); lamp.position.set(0.12, 1.72, -0.2); g.add(lamp);
+  const tag = textSprite(nameOf(id), c); tag.position.y = 2.15; g.add(tag);
+  return g;
+}
+function makeMonMesh(type) {
+  const g = new THREE.Group(), parts = {};
+  const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffe08a, fog: false });
+  g.userData.eyeMat = eyeMat;
+  const eyeG = geo('eye', () => new THREE.SphereGeometry(0.045, 8, 6));
+  if (type === 'wander') {
+    const m = mat('mw', () => new THREE.MeshLambertMaterial({ color: 0x5a5d66 }));
+    const body = new THREE.Mesh(geo('mwb', () => new THREE.CylinderGeometry(0.22, 0.34, 1.6, 10)), m); body.position.y = 0.8; body.rotation.x = -0.25; g.add(body);
+    const head = new THREE.Mesh(geo('mwh', () => new THREE.SphereGeometry(0.26, 12, 10)), m); head.position.set(0, 1.75, -0.35); g.add(head);
+    const armG = geo('mwa', () => new THREE.BoxGeometry(0.08, 0.08, 1.3));
+    parts.a1 = new THREE.Mesh(armG, m); parts.a1.position.set(0.32, 1.25, -0.55); g.add(parts.a1);
+    parts.a2 = new THREE.Mesh(armG, m); parts.a2.position.set(-0.32, 1.25, -0.55); g.add(parts.a2);
+    for (const sx of [-0.09, 0.09]) { const e = new THREE.Mesh(eyeG, eyeMat); e.position.set(sx, 1.78, -0.58); g.add(e); }
+  } else if (type === 'runner') {
+    const m = mat('mr', () => new THREE.MeshLambertMaterial({ color: 0x8e1f1f }));
+    const body = new THREE.Mesh(geo('mrb', () => new THREE.IcosahedronGeometry(0.38, 0)), m); body.position.y = 0.75; g.add(body); parts.body = body;
+    const sp = geo('mrs', () => new THREE.ConeGeometry(0.08, 0.45, 6));
+    for (let i = 0; i < 8; i++) { const s = new THREE.Mesh(sp, m); const a = i / 8 * Math.PI * 2; s.position.set(Math.cos(a) * 0.38, Math.sin(a) * 0.38, 0); s.rotation.z = a - Math.PI / 2; body.add(s); }
+    const legG = geo('mrl', () => new THREE.BoxGeometry(0.06, 0.6, 0.06));
+    parts.l1 = new THREE.Mesh(legG, m); parts.l1.position.set(0.15, 0.3, 0); g.add(parts.l1);
+    parts.l2 = new THREE.Mesh(legG, m); parts.l2.position.set(-0.15, 0.3, 0); g.add(parts.l2);
+    for (const sx of [-0.1, 0.1]) { const e = new THREE.Mesh(eyeG, eyeMat); e.position.set(sx, 0.85, -0.36); g.add(e); }
+  } else {
+    const m = mat('mb', () => new THREE.MeshLambertMaterial({ color: 0x4a2c63 }));
+    const body = new THREE.Mesh(geo('mbb', () => new THREE.SphereGeometry(1.0, 18, 14)), m); body.position.y = 1.05; body.scale.set(1, 0.95, 1); g.add(body);
+    parts.mouth = new THREE.Mesh(geo('mbm', () => new THREE.BoxGeometry(0.9, 0.35, 0.3)), mat('black', () => new THREE.MeshBasicMaterial({ color: 0x0a050a }))); parts.mouth.position.set(0, 0.75, -0.88); g.add(parts.mouth);
+    const tg = geo('mbt', () => new THREE.ConeGeometry(0.06, 0.18, 4)), tm = mat('teeth', () => new THREE.MeshLambertMaterial({ color: 0xdddddd }));
+    for (let i = -3; i <= 3; i++) { const t = new THREE.Mesh(tg, tm); t.position.set(i * 0.12, 0.86, -0.98); t.rotation.x = Math.PI; g.add(t); }
+    for (const sx of [-0.28, 0.28]) { const e = new THREE.Mesh(geo('eyeb', () => new THREE.SphereGeometry(0.09, 8, 6)), eyeMat); e.position.set(sx, 1.4, -0.9); g.add(e); }
+  }
+  g.userData.parts = parts;
+  return g;
+}
+function makeCartMesh() {
+  const g = new THREE.Group();
+  const m = mat('cart', () => new THREE.MeshLambertMaterial({ color: 0x6d8296 })), md = mat('cartd', () => new THREE.MeshLambertMaterial({ color: 0x3c4855 }));
+  // ローカル +x が進行方向。持ち手は後ろ（-x）
+  const L = 2.0, Wd = 1.5, Hh = 0.6, y0 = 0.35;
+  const bottom = new THREE.Mesh(geo('cb', () => new THREE.BoxGeometry(L, 0.06, Wd)), md); bottom.position.y = y0; g.add(bottom);
+  const sideG = geo('cs', () => new THREE.BoxGeometry(L, Hh, 0.06)), endG = geo('ce', () => new THREE.BoxGeometry(0.06, Hh, Wd));
+  for (const z of [-Wd / 2, Wd / 2]) { const s = new THREE.Mesh(sideG, m); s.position.set(0, y0 + Hh / 2, z); g.add(s); }
+  for (const x of [-L / 2, L / 2]) { const s = new THREE.Mesh(endG, m); s.position.set(x, y0 + Hh / 2, 0); g.add(s); }
+  const hm = mat('handle', () => new THREE.MeshLambertMaterial({ color: 0xffd84d, emissive: 0x4a3600 }));
+  const hx0 = -HANDLE_OFF * SC;
+  const bar = new THREE.Mesh(geo('chb', () => new THREE.CylinderGeometry(0.05, 0.05, 1.2, 8)), hm); bar.rotation.x = Math.PI / 2; bar.position.set(hx0, 1.05, 0); g.add(bar);
+  const armG = geo('cha', () => new THREE.BoxGeometry(-hx0 - L / 2 + 0.05, 0.05, 0.05));
+  for (const z of [-0.5, 0.5]) { const a = new THREE.Mesh(armG, md); a.position.set((hx0 - L / 2) / 2, 0.98, z); a.rotation.z = -0.25; g.add(a); }
+  const wg = geo('cw', () => new THREE.CylinderGeometry(0.17, 0.17, 0.08, 12)), wm = mat('wheel', () => new THREE.MeshLambertMaterial({ color: 0x151515 }));
+  for (const [x, z] of [[-0.75, -0.65], [0.75, -0.65], [-0.75, 0.65], [0.75, 0.65]]) { const w = new THREE.Mesh(wg, wm); w.rotation.x = Math.PI / 2; w.position.set(x, 0.17, z); g.add(w); }
+  return g;
+}
+// ---- お宝の3Dモデル（半径1の大きさで作り、当たり判定の半径に合わせて拡大） ----
+const ITEM_TPL = {};
+const phong = (col, o = {}) => mat('ph' + col + JSON.stringify(o), () => new THREE.MeshPhongMaterial(Object.assign({ color: col, shininess: 30 }, o)));
+const lathe = (pts, seg = 22) => new THREE.LatheGeometry(pts.map(([x, y]) => new THREE.Vector2(x, y)), seg);
+function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.userData = { shared: 1 }; return t; }
+function itemTemplate(d) {
+  if (ITEM_TPL[d]) return ITEM_TPL[d];
+  const g = new THREE.Group();
+  const add = (geo, m, x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0, sx = 1, sy = 1, sz = 1, parent = g) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.rotation.set(rx, ry, rz); o.scale.set(sx, sy, sz); parent.add(o); return o; };
+  const B = (w, h, dd) => new THREE.BoxGeometry(w, h, dd), Cy = (a, b, h, n = 16) => new THREE.CylinderGeometry(a, b, h, n), Sp = (r, n = 18) => new THREE.SphereGeometry(r, n, Math.round(n * 0.75));
+  const gold = phong(0xd9a92e, { shininess: 90, specular: 0xffe9a0 }), dark = phong(0x2a2420), wood = phong(0x7a4a24), black = phong(0x111111, { shininess: 80 });
+  switch (d) {
+    case 0: // ガラスの花瓶
+      add(lathe([[0, 0], [0.55, 0], [0.8, 0.3], [0.95, 0.9], [0.7, 1.5], [0.36, 1.85], [0.42, 2.1], [0.52, 2.2], [0.46, 2.2]]), phong(0x6fb6e6, { transparent: true, opacity: 0.8, shininess: 110, specular: 0xffffff, side: THREE.DoubleSide }));
+      add(lathe([[0.86, 0.95], [0.9, 1.05], [0.82, 1.2]]), gold); break;
+    case 1: // 置き時計
+      add(B(1.6, 0.2, 0.9), dark, 0, 0.1); add(B(1.4, 1.8, 0.8), wood, 0, 1.1);
+      add(Cy(0.58, 0.58, 0.08, 24), gold, 0, 1.3, 0.4, Math.PI / 2);
+      add(Cy(0.5, 0.5, 0.1, 24), phong(0xf4efe2), 0, 1.3, 0.41, Math.PI / 2);
+      add(B(0.05, 0.4, 0.04), black, 0, 1.45, 0.48); add(B(0.32, 0.05, 0.04), black, 0.14, 1.3, 0.48);
+      add(lathe([[0, 2.0], [0.5, 2.0], [0.3, 2.3], [0, 2.35]], 4), wood, 0, 0, 0, 0, Math.PI / 4); break;
+    case 2: { // 古い絵画
+      const tex = canvasTex(128, 96, (x, w, h) => {
+        const gr = x.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#f2b36b'); gr.addColorStop(0.55, '#e97f5c'); gr.addColorStop(0.56, '#3d6b4f'); gr.addColorStop(1, '#22402f');
+        x.fillStyle = gr; x.fillRect(0, 0, w, h); x.fillStyle = '#fff3c4'; x.beginPath(); x.arc(86, 40, 12, 0, 7); x.fill();
+        x.fillStyle = '#2b4a39'; x.beginPath(); x.moveTo(0, 60); x.quadraticCurveTo(40, 35, 80, 62); x.lineTo(0, 96); x.fill();
+      });
+      add(B(2.0, 1.5, 0.14), gold, 0, 0.95); add(new THREE.PlaneGeometry(1.7, 1.2), new THREE.MeshPhongMaterial({ map: tex, shininess: 5 }), 0, 0.95, 0.075);
+      add(B(0.3, 0.2, 0.6), dark, 0, 0.1, -0.15); break;
+    }
+    case 3: // 水晶玉
+      add(Cy(0.5, 0.65, 0.35, 20), dark, 0, 0.17); add(lathe([[0.45, 0.33], [0.6, 0.45], [0.5, 0.55]]), gold);
+      add(Sp(0.78, 24), phong(0xb27cff, { transparent: true, opacity: 0.75, shininess: 130, specular: 0xffffff, emissive: 0x2a0a4a }), 0, 1.25);
+      add(Sp(0.3, 12), new THREE.MeshBasicMaterial({ color: 0xe6c8ff, transparent: true, opacity: 0.5 }), 0, 1.25); break;
+    case 4: // 真空管ラジオ
+      add(B(1.8, 1.2, 0.9), phong(0x6b3e1f, { shininess: 50 }), 0, 0.6);
+      add(B(1.0, 0.75, 0.04), phong(0xd8c7a0), -0.3, 0.68, 0.46);
+      for (let i = 0; i < 5; i++) add(B(0.9, 0.03, 0.02), dark, -0.3, 0.42 + i * 0.13, 0.49);
+      add(Cy(0.13, 0.13, 0.1), gold, 0.58, 0.85, 0.47, Math.PI / 2); add(Cy(0.13, 0.13, 0.1), gold, 0.58, 0.45, 0.47, Math.PI / 2);
+      add(Cy(0.02, 0.02, 1.0, 6), phong(0x999999), 0.6, 1.6, -0.2, 0, 0, -0.3); break;
+    case 5: // 宝石
+      add(new THREE.OctahedronGeometry(0.9, 0), phong(0x4fe3ff, { shininess: 140, specular: 0xffffff, emissive: 0x0a3a50, flatShading: true }), 0, 1.0, 0, 0, 0.4, 0, 1, 1.25, 1); break;
+    case 6: { // 地球儀
+      const tex = canvasTex(128, 64, (x, w, h) => { x.fillStyle = '#2f6fb5'; x.fillRect(0, 0, w, h); x.fillStyle = '#5aa04a'; for (const [a, b, c, e] of [[20, 20, 18, 12], [40, 40, 10, 14], [70, 18, 22, 10], [95, 38, 14, 12], [110, 14, 8, 6]]) { x.beginPath(); x.ellipse(a, b, c, e, 0.3, 0, 7); x.fill(); } });
+      add(Cy(0.6, 0.72, 0.15, 20), wood, 0, 0.07); add(Cy(0.05, 0.05, 0.6, 8), gold, 0, 0.42);
+      add(new THREE.SphereGeometry(0.75, 24, 18), new THREE.MeshPhongMaterial({ map: tex, shininess: 40 }), 0, 1.4, 0, 0, 0, 0.4);
+      add(new THREE.TorusGeometry(0.86, 0.04, 6, 24, Math.PI), gold, 0, 1.4, 0, 0, Math.PI / 2, Math.PI / 2 + 0.4); break;
+    }
+    case 7: { // バイオリン（床に寝かせる）
+      const v = new THREE.Group(); v.rotation.x = -Math.PI / 2; v.position.y = 0.22; g.add(v);
+      const br = phong(0x9a4515, { shininess: 70 });
+      add(Sp(1, 20), br, 0, -0.55, 0, 0, 0, 0, 0.62, 0.62, 0.2, v); add(Sp(1, 20), br, 0, 0.3, 0, 0, 0, 0, 0.5, 0.5, 0.2, v);
+      add(B(0.14, 1.1, 0.1), black, 0, 1.1, 0.12, 0, 0, 0, 1, 1, 1, v); add(Sp(0.12, 10), br, 0, 1.7, 0.12, 0, 0, 0, 1, 1, 1, v);
+      for (const x of [-0.04, 0.04]) add(B(0.01, 2.0, 0.01), phong(0xdddddd), x, 0.3, 0.2, 0, 0, 0, 1, 1, 1, v); break;
+    }
+    case 8: // トロフィー
+      add(B(0.9, 0.35, 0.9), dark, 0, 0.17); add(Cy(0.1, 0.22, 0.5, 12), gold, 0, 0.6);
+      add(lathe([[0.08, 0.85], [0.6, 1.0], [0.75, 1.5], [0.8, 1.9], [0.72, 1.9]]), gold);
+      for (const x of [-0.85, 0.85]) add(new THREE.TorusGeometry(0.22, 0.05, 6, 14), gold, x, 1.45, 0, 0, 0, 0); break;
+    case 9: { // テディベア
+      const fur = phong(0xa86b3c, { shininess: 4 }), light = phong(0xe0b48a, { shininess: 4 });
+      add(Sp(0.68), fur, 0, 0.72, 0, 0, 0, 0, 1, 1.1, 0.9); add(Sp(0.5), fur, 0, 1.62);
+      for (const x of [-0.36, 0.36]) { add(Sp(0.18, 10), fur, x, 2.02); add(Sp(0.26, 12), fur, x * 1.8, 0.95, 0.15); add(Sp(0.3, 12), fur, x * 1.1, 0.22, 0.35); }
+      add(Sp(0.2, 10), light, 0, 1.52, 0.42); add(Sp(0.06, 6), black, 0, 1.58, 0.6);
+      for (const x of [-0.17, 0.17]) add(Sp(0.06, 6), black, x, 1.75, 0.42); break;
+    }
+    case 10: // ワイングラス
+      add(lathe([[0, 0], [0.5, 0], [0.5, 0.05], [0.06, 0.1], [0.06, 0.95], [0.48, 1.2], [0.58, 1.6], [0.52, 2.05]]), phong(0xe8f4ff, { transparent: true, opacity: 0.45, shininess: 130, specular: 0xffffff, side: THREE.DoubleSide }));
+      add(lathe([[0, 1.05], [0.42, 1.22], [0.52, 1.5], [0, 1.5]]), phong(0x8a0f2a, { shininess: 80 })); break;
+    case 11: // 黄金の像
+      add(B(1.3, 1.1, 1.0), gold, 0, 0.55); add(B(1.0, 1.5, 0.9), gold, 0, 1.85);
+      add(B(0.26, 0.7, 0.3), gold, 0, 1.85, 0.5); add(B(1.05, 0.16, 0.98), gold, 0, 2.35, 0.03); add(B(0.5, 0.08, 0.1), dark, 0, 1.35, 0.46); break;
+    case 12: // グランドピアノ
+      add(B(1.8, 0.55, 1.6), black, 0, 1.05); add(B(1.8, 0.04, 1.6), black, 0, 1.55, -0.35, -0.55);
+      add(B(1.6, 0.06, 0.32), phong(0xf6f6f0), 0, 1.0, 0.92);
+      for (let i = 0; i < 9; i++) if (i % 3 !== 2) add(B(0.08, 0.05, 0.18), black, -0.72 + i * 0.18, 1.05, 0.86);
+      for (const [x, z] of [[-0.75, -0.65], [0.75, -0.65], [0, 0.65]]) add(Cy(0.07, 0.05, 0.8, 8), black, x, 0.4, z); break;
+    case 13: { // 古い甲冑
+      const steel = phong(0xb8c0c8, { shininess: 100, specular: 0xffffff });
+      for (const x of [-0.25, 0.25]) { add(Cy(0.17, 0.14, 1.0, 10), steel, x, 0.5); add(Cy(0.12, 0.11, 0.8, 10), steel, x * 2.6, 1.45, 0, 0, 0, x > 0 ? 0.25 : -0.25); }
+      add(Cy(0.55, 0.42, 1.0, 14), steel, 0, 1.45); for (const x of [-0.6, 0.6]) add(Sp(0.28, 12), steel, x, 1.9);
+      add(Sp(0.36, 16), steel, 0, 2.3); add(B(0.4, 0.08, 0.1), black, 0, 2.3, 0.33); add(Cy(0.03, 0.03, 0.4, 6), phong(0xb02020), 0, 2.75, 0); break;
+    }
+    case HEAD: { // 頭（持ち主の色にぬり直す）
+      add(Sp(0.75, 20), phong(0xffffff, { shininess: 30 }), 0, 0.78);
+      add(B(0.9, 0.32, 0.25), new THREE.MeshBasicMaterial({ color: 0x8fe3ff }), 0, 0.85, 0.62);
+      add(Cy(0.3, 0.35, 0.25, 12), dark, 0, 0.12); break;
+    }
+    default: // 魂のオーブ
+      add(Sp(0.7, 24), phong(0x40d8ff, { emissive: 0x1a90c0, transparent: true, opacity: 0.85, shininess: 120 }), 0, 1.0);
+      add(Sp(0.35, 12), new THREE.MeshBasicMaterial({ color: 0xffffff }), 0, 1.0);
+  }
+  g.traverse(o => { if (o.geometry) o.geometry.userData = { shared: 1 }; });
+  const box = new THREE.Box3().setFromObject(g); g.userData.h = box.max.y;
+  return ITEM_TPL[d] = g;
+}
+function makeFurniture(f) {
+  const F = FURN[f.type], g = new THREE.Group(), m = phong(F.col, { shininess: f.type === 'fridge' ? 60 : 12 }), dark = phong(0x2a2420);
+  const box = (w, h, dd, x, y, z, mm = m) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, dd), mm); o.position.set(x, y, z); g.add(o); return o; };
+  const W = F.w, D = F.d, H = F.h, t = 0.06;
+  if (F.open) { // 前が開いた収納（中の段に物が置ける）
+    box(W, H, t, 0, H / 2, -D / 2 + t / 2); box(t, H, D, -W / 2 + t / 2, H / 2, 0); box(t, H, D, W / 2 - t / 2, H / 2, 0);
+    box(W, t, D, 0, H - t / 2, 0); box(W, t, D, 0, t / 2, 0); box(W - 2 * t, t, D - t, 0, F.sup - t / 2, t / 2);
+    if (H > 1.5) box(W - 2 * t, t, D - t, 0, F.sup + 0.65, t / 2);
+    const door = box(W / 2, H - 0.1, t, 0, H / 2, 0); door.position.set(W / 2 + W / 4 * Math.cos(1.2), H / 2, D / 2 + W / 4 * Math.sin(1.2)); door.rotation.y = -1.2;
+    if (F.cold) { const l = new THREE.Mesh(new THREE.PlaneGeometry(W - 0.2, 0.5), new THREE.MeshBasicMaterial({ color: 0xcfefff })); l.position.set(0, H - 0.3, -D / 2 + 0.08); g.add(l); }
+  } else if (F.legs) { // テーブル・机
+    box(W, 0.08, D, 0, H - 0.04, 0);
+    for (const [lx, lz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) box(0.08, H - 0.08, 0.08, lx * (W / 2 - 0.1), (H - 0.08) / 2, lz * (D / 2 - 0.1), dark);
+  } else if (f.type === 'bed') {
+    box(W, 0.35, D, 0, 0.18, 0, phong(0x7a7f86)); box(W - 0.1, 0.2, D - 0.1, 0, 0.45, 0); box(W - 0.3, 0.15, 0.4, 0, 0.6, -D / 2 + 0.3, phong(0xffffff));
+  } else if (f.type === 'sofa') {
+    box(W, 0.45, D, 0, 0.225, 0); box(W, 0.5, 0.25, 0, 0.7, -D / 2 + 0.125); box(0.25, 0.3, D, -W / 2 + 0.125, 0.6, 0); box(0.25, 0.3, D, W / 2 - 0.125, 0.6, 0);
+  } else if (f.type === 'crate') {
+    box(W, H, D, 0, H / 2, 0); for (const y of [0.15, H - 0.15]) box(W + 0.02, 0.1, D + 0.02, 0, y, 0, phong(0x5e4524));
+  } else if (f.type === 'pedestal') {
+    box(W, H, D, 0, H / 2, 0); box(W + 0.15, 0.12, D + 0.15, 0, H - 0.06, 0);
+  } else { // タンス・薬品棚
+    box(W, H, D, 0, H / 2, 0);
+    for (let i = 0; i < 3; i++) { box(W - 0.15, H / 3 - 0.08, 0.02, 0, H / 6 + i * H / 3, D / 2 + 0.01, phong(f.type === 'cabinet' ? 0xaab4b0 : 0x4a301c)); box(0.25, 0.04, 0.05, 0, H / 6 + i * H / 3, D / 2 + 0.04, phong(0xd9a92e)); }
+  }
+  const back = (TS - D) / 2;
+  g.position.set((f.x + 0.5) * TS - f.dx * back, 0, (f.y + 0.5) * TS - f.dy * back);
+  g.rotation.y = Math.atan2(f.dx, f.dy);
+  return g;
+}
+const ringGeo = geo('ring', () => new THREE.RingGeometry(1.05, 1.3, 36));
+function makeItemModel(d, owner) {
+  const tpl = itemTemplate(d), g = new THREE.Group(), body = tpl.clone();
+  if (d === HEAD) { const pm = mat('headc' + colOf(owner), () => new THREE.MeshPhongMaterial({ color: colOf(owner), shininess: 30 })); body.children[0].material = pm; }
+  const k = ITEMS[d].r * SC * 0.95; body.scale.setScalar(k); g.add(body);
+  const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0xffd84d, transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide }));
+  ring.rotation.x = -Math.PI / 2; ring.position.y = 0.03; ring.scale.setScalar(ITEMS[d].r * SC); g.add(ring);
+  g.userData = { body, ring, k, h: tpl.userData.h * k, rot: Math.random() * 6.28 };
+  return g;
+}
+// つかみビーム（太い光の筒）
+const beamCoreGeo = geo('bcore', () => new THREE.CylinderGeometry(1, 1, 1, 10, 1, true));
+const beamTipGeo = geo('btip', () => new THREE.SphereGeometry(1, 12, 10));
+const BEAMS = [];
+for (let i = 0; i < 6; i++) {
+  const core = new THREE.Mesh(beamCoreGeo, new THREE.MeshBasicMaterial({ color: 0xd8f2ff, fog: false }));
+  const glow = new THREE.Mesh(beamCoreGeo, new THREE.MeshBasicMaterial({ color: 0x3fa0ff, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false, fog: false }));
+  const tip = new THREE.Mesh(beamTipGeo, new THREE.MeshBasicMaterial({ color: 0x8fd4ff, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false, fog: false }));
+  for (const o of [core, glow, tip]) { o.visible = false; o.frustumCulled = false; scene.add(o); }
+  BEAMS.push({ core, glow, tip });
+}
+const _UP = new THREE.Vector3(0, 1, 0), _a = new THREE.Vector3(), _b = new THREE.Vector3(), _d = new THREE.Vector3();
+function setBeam(bm, ax, ay, az, bx, by, bz, t) {
+  _a.set(ax, ay, az); _b.set(bx, by, bz); _d.subVectors(_b, _a); const len = _d.length(); if (len < 0.01) return;
+  _d.normalize();
+  const w = 1 + Math.sin(t * 14) * 0.15;
+  for (const [o, r] of [[bm.core, 0.03], [bm.glow, 0.085 * w]]) {
+    o.visible = true; o.position.addVectors(_a, _b).multiplyScalar(0.5); o.quaternion.setFromUnitVectors(_UP, _d); o.scale.set(r, len, r);
+  }
+  bm.tip.visible = true; bm.tip.position.copy(_b); bm.tip.scale.setScalar(0.13 * w);
+}
+const CART_SL = [[-12, -8], [0, -8], [12, -8], [-12, 8], [0, 8], [12, 8]];
+
+function eyeOf(v) { return v.id === myId && ME ? ME : { x: v.cx, y: v.cy, yaw: v.yaw, pitch: v.pitch, z: v.z || 0, crouch: v.cr }; }
+const eyeH = e => (e.z || 0) - (e.crouch ? 0.55 : 0);
+function syncScene(dt, t) {
+  for (const [id, v] of V.players) {
+    if (id === myId) continue;
+    let m = MESH.players.get(id);
+    if (!m) { m = makeAvatar(id); world.add(m); MESH.players.set(id, m); }
+    m.visible = !v.dead;
+    m.position.set(v.cx * SC, v.z || 0, v.cy * SC); m.rotation.y = -v.yaw - Math.PI / 2; m.scale.y = v.cr ? 0.68 : 1;
+  }
+  for (const [id, m] of MESH.players) if (!V.players.has(id) || id === myId) { world.remove(m); MESH.players.delete(id); }
+  V.carts.forEach((c, i) => {
+    let m = MESH.carts[i];
+    if (!m) { m = MESH.carts[i] = makeCartMesh(); world.add(m); }
+    m.position.set(c.cx * SC, 0, c.cy * SC); m.rotation.y = -c.cang;
+  });
+  const fx = Math.cos(ME.yaw), fy = Math.sin(ME.yaw), LR = lightR();
+  for (const [id, v] of V.items) {
+    let s = MESH.items.get(id);
+    if (!s) { s = makeItemModel(v.d, v.owner); world.add(s); MESH.items.set(id, s); }
+    const U = s.userData;
+    let x = v.cx, y = v.cy, base = 0, rot = U.rot, sc = 1;
+    if (v.st === 2 && V.carts[v.cart]) { // カートの中：落とした位置・向き・大きさのまま入る（重なれば上に積まれる）
+      const c = V.carts[v.cart], ca = Math.cos(c.cang), sa = Math.sin(c.cang);
+      x = c.cx + v.lx * ca - v.ly * sa; y = c.cy + v.lx * sa + v.ly * ca;
+      if (U.crel == null) U.crel = U.rot + c.cang;
+      rot = -c.cang + U.crel;
+      let hgt = 0.4;
+      for (const o of V.items.values()) {
+        if (o === v || o.st !== 2 || o.cart !== v.cart || (o.layer || 0) >= (v.layer || 0)) continue;
+        if (Math.hypot(o.lx - v.lx, o.ly - v.ly) > (ITEMS[o.d].r + ITEMS[v.d].r) * 0.75) continue;
+        const om = MESH.items.get(o.id); if (om && om.userData.bz != null) hgt = Math.max(hgt, om.userData.bz + om.userData.h * 0.85);
+      }
+      U.bz = U.bz == null ? Math.max(hgt, s.position.y) : U.bz + (hgt - U.bz) * Math.min(1, dt * 9);
+      base = U.bz;
+    } else if (v.st === 3) { // 箱の中（覆われている）
+      base = 0; U.crel = U.bz = null;
+    } else {
+      base = v.cz; U.crel = U.bz = null;
+      if (v.st === 1) { const hp = V.players.get(v.holder), e = hp ? eyeOf(hp) : null; if (e) rot = -e.yaw - Math.PI / 2; }
+      U.rot = rot; // 離しても向きはそのまま
+    }
+    s.position.set(x * SC, base, y * SC);
+    s.rotation.y = rot; U.body.scale.setScalar(U.k * sc);
+    // 床の黄色いリング（残りの価値で色が変わる）
+    U.ring.visible = v.st === 0;
+    if (v.st === 0) { U.ring.position.y = 0.03 - base; }
+    if (v.st === 0) {
+      const ratio = clamp(v.val / v.base, 0, 1);
+      U.ring.material.color.setHex(ratio > 0.6 ? 0xffd84d : ratio > 0.3 ? 0xff9f43 : 0xff4a3d);
+      U.ring.material.opacity = 0.35 + 0.25 * Math.sin(t * 4 + id);
+    }
+    U.cy = base + U.h * sc * 0.5;
+  }
+  for (const [id, s] of MESH.items) if (!V.items.has(id)) { world.remove(s); s.userData.ring.material.dispose(); MESH.items.delete(id); }
+  for (const [id, v] of V.mons) {
+    let m = MESH.mons.get(id);
+    if (!m) { m = makeMonMesh(v.type); world.add(m); MESH.mons.set(id, m); }
+    m.position.set(v.cx * SC, 0, v.cy * SC); m.rotation.y = -v.cf - Math.PI / 2;
+    const P = m.userData.parts, sw = Math.sin(t * 6 + id);
+    if (v.type === 'wander') { P.a1.position.y = 1.2 + sw * 0.1; P.a2.position.y = 1.2 - sw * 0.1; m.position.y = Math.abs(sw) * 0.04; }
+    else if (v.type === 'runner') { P.body.rotation.y = t * 4; P.l1.rotation.x = sw * 0.8; P.l2.rotation.x = -sw * 0.8; m.position.y = Math.abs(sw) * 0.08; }
+    else { P.mouth.scale.y = 0.6 + 0.5 * Math.abs(Math.sin(t * 2.5 + id)); m.position.y = Math.abs(sw) * 0.05; }
+    if (v.held) m.position.y = 0.55 + Math.abs(Math.sin(t * 18)) * 0.08;
+    m.userData.eyeMat.color.setHex(v.st === 2 ? 0x78c8ff : v.st === 1 ? 0xff2a1a : 0xffe08a);
+  }
+  for (const [id, m] of MESH.mons) if (!V.mons.has(id)) { world.remove(m); m.userData.eyeMat.dispose(); MESH.mons.delete(id); }
+  // つかみビーム
+  let n = 0;
+  for (const v of V.players.values()) {
+    if (v.hold === -99 || v.hold == null || v.dead || n >= 6) continue;
+    let tx, ty, th;
+    if (v.hold >= MON_ID) { const mm = MESH.mons.get(v.hold - MON_ID); if (!mm) continue; tx = mm.position.x / SC; ty = mm.position.z / SC; th = 1.2; }
+    else if (v.hold < 0) { const c = V.carts[-v.hold - 1]; if (!c) continue; tx = c.cx - Math.cos(c.cang) * HANDLE_OFF; ty = c.cy - Math.sin(c.cang) * HANDLE_OFF; th = 1.05; }
+    else { const s = MESH.items.get(v.hold); if (!s) continue; tx = s.position.x / SC; ty = s.position.z / SC; th = s.userData.cy; }
+    const e = eyeOf(v), ex = Math.cos(e.yaw), ey = Math.sin(e.yaw);
+    const me = v.id === myId, ox = e.x + ex * (me ? 8 : 10) - ey * (me ? 7 : 6), oy = e.y + ey * (me ? 8 : 10) + ex * (me ? 7 : 6);
+    setBeam(BEAMS[n++], ox * SC, (me ? EYE - 0.42 : 1.2) + eyeH(e), oy * SC, tx * SC, th, ty * SC, t);
+  }
+  for (let i = n; i < 6; i++) { const b = BEAMS[i]; b.core.visible = b.glow.visible = b.tip.visible = false; }
+  // 懐中電灯
+  let si = 0;
+  for (const v of V.players.values()) {
+    if (si >= 6) break;
+    if (v.dead) continue;
+    const e = eyeOf(v), s = SPOTS[si++], cp = Math.cos(e.pitch);
+    s.intensity = 2.3; s.distance = LR * SC * 1.3;
+    s.position.set(e.x * SC, (v.id === myId ? EYE - 0.15 : 1.7) + eyeH(e), e.y * SC);
+    s.target.position.set((e.x + Math.cos(e.yaw) * cp * 100) * SC, s.position.y + Math.sin(e.pitch) * 100 * SC, (e.y + Math.sin(e.yaw) * cp * 100) * SC);
+  }
+  for (; si < 6; si++) SPOTS[si].intensity = 0;
+  // 部屋の照明（近い4つ）
+  const cand = LIGHTSRC.filter(l => !(GS.death && (l.kind === 'room' || l.kind === 'hall'))).map(l => ({ l, d: Math.hypot(l.x - ME.x, l.y - ME.y) })).sort((a, b) => a.d - b.d);
+  POINTS.forEach((p, i) => {
+    const c = cand[i];
+    if (!c || c.d > 1400) { p.intensity = 0; return; }
+    const l = c.l;
+    p.position.set(l.x * SC, l.h, l.y * SC); p.distance = l.dist; p.color.setHex(l.kind === 'truck' && GS.death ? 0x80ff9a : l.col);
+    p.intensity = l.kind === 'room' ? 1.15 * l.room.fl : l.kind === 'hall' ? 0.8 : l.kind === 'desk' ? 1.0 : GS.death ? 0.8 : 1.1;
+  });
+  for (const l of LIGHTSRC) if (l.kind === 'hall') l.lamp.material.color.setHex(GS.death ? 0x221a14 : 0xffe6b0);
+  for (const r of MAP.rooms) if (r.lamp) r.lamp.material.color.setHex(GS.death && r.id ? 0x221a14 : r.fl < 1 ? 0x8a826a : r.id ? 0xfff0c8 : 0xd8ffe0);
+  const ready = GS.sold >= GS.quota;
+  world.userData.screen.material.color.setHex(ready ? (Math.sin(t * 6) > 0 ? 0x7dffa0 : 0x2e8f4a) : 0x3a5a44);
+  for (const d of MAP.desks) {
+    if (isClient() && d.anim != null) { d.anim += dt; if (d.anim >= 2.5) d.anim = null; }
+    if (d.box) {
+      // 天井から床まで一気に落ちて、エリアの物を覆って回収 → 上がる
+      const a = d.anim, top = WALL_H + d.box.bh / 2 + 0.1, low = d.box.bh / 2 + 0.01;
+      let y = top;
+      if (a != null) y = a < 0.8 ? top + (low - top) * Math.pow(a / 0.8, 2) : a < 1.7 ? low : top + (low - top) * (1 - Math.pow((a - 1.7) / 0.8, 2));
+      d.box.g.position.y = y; d.box.g.visible = a != null;
+      d.box.mouth.material.opacity = 0; d.box.col.visible = false;
+    }
+    d.glow = Math.max(0, d.glow - dt);
+    d.glowMesh.material.opacity = 0.08 + 0.05 * Math.sin(t * 3) + d.glow * 0.4;
+    d.btnMesh.material.color.setHex(d.glow > 0 ? 0xff9a8f : 0xe5332a);
+  }
+  ambient.intensity = (GS.death ? 0.16 : 0.4) * (MAP.stage.amb || 1);
+  ambient.color.setHex(GS.death ? 0x803030 : 0x7a7a90);
+  scene.fog.color.setHex(GS.death ? 0x0c0000 : 0x000000);
+  renderer.setClearColor(GS.death ? 0x0c0000 : 0x000000);
+}
+
+// ================= HUD =================
+const _pv = new THREE.Vector3();
+function proj(x, h, y) {
+  _pv.set(x * SC, h, y * SC).project(camera);
+  if (_pv.z > 1 || _pv.z < -1) return null;
+  return { x: (_pv.x + 1) / 2 * VW, y: (1 - _pv.y) / 2 * VH };
+}
+function bar(x, y, w, h, r, col, label) {
+  hx.fillStyle = 'rgba(0,0,0,.6)'; hx.fillRect(x - 2, y - 2, w + 4, h + 4);
+  hx.fillStyle = '#222'; hx.fillRect(x, y, w, h);
+  hx.fillStyle = col; hx.fillRect(x, y, w * clamp(r, 0, 1), h);
+  if (label) { hx.fillStyle = '#fff'; hx.font = '800 11px "M PLUS Rounded 1c",sans-serif'; hx.textAlign = 'left'; hx.fillText(label, x + 5, y + h - 3); }
+}
+function drawHUD(dt, t) {
+  hx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  hx.clearRect(0, 0, VW, VH);
+  if (!playing || !ME) return;
+  for (const q of FX.parts) {
+    q.x += q.vx * dt; q.y += q.vy * dt; q.vx *= 0.92; q.vy *= 0.92; q.h = Math.max(0, q.h + q.vh * dt); q.vh -= 9 * dt; q.t -= dt;
+    const s = proj(q.x, q.h, q.y); if (!s) continue;
+    const d = Math.max(30, Math.hypot(q.x - ME.x, q.y - ME.y)), z = clamp(200 / d, 0.3, 3);
+    hx.globalAlpha = clamp(q.t * 2, 0, 1); hx.fillStyle = q.c; hx.fillRect(s.x - q.s * z / 2, s.y - q.s * z / 2, q.s * z, q.s * z);
+  }
+  FX.parts = FX.parts.filter(q => q.t > 0);
+  hx.textAlign = 'center';
+  for (const q of FX.texts) {
+    q.h += 0.6 * dt; q.t -= dt;
+    const s = proj(q.x, q.h, q.y); if (!s) continue;
+    hx.globalAlpha = clamp(q.t, 0, 1); hx.font = '800 16px "M PLUS Rounded 1c",sans-serif';
+    hx.lineWidth = 4; hx.strokeStyle = '#000'; hx.strokeText(q.text, s.x, s.y); hx.fillStyle = q.col; hx.fillText(q.text, s.x, s.y);
+  }
+  FX.texts = FX.texts.filter(q => q.t > 0);
+  hx.globalAlpha = 1;
+  for (const q of FX.tracers) { // 弾道
+    q.t -= dt;
+    const a = q.me ? { x: VW * 0.68, y: VH * 0.78 } : proj(q.x0, 1.35, q.y0), b = proj(q.x1, 1.35, q.y1);
+    if (!a || !b) continue;
+    hx.globalAlpha = clamp(q.t * 8, 0, 1); hx.strokeStyle = '#ffe9a0'; hx.lineWidth = 3; hx.beginPath(); hx.moveTo(a.x, a.y); hx.lineTo(b.x, b.y); hx.stroke();
+  }
+  FX.tracers = FX.tracers.filter(q => q.t > 0); hx.globalAlpha = 1;
+  if (RUN.gun && !ME.dead) { // 手元の拳銃
+    const gx = VW * 0.7, gy = VH - 10, k = Math.min(1.4, VW / 700), rec = FX.muzzle > 0 ? 10 : 0;
+    hx.save(); hx.translate(gx, gy + rec); hx.scale(k, k);
+    hx.fillStyle = '#2b2d31'; hx.fillRect(-14, -120, 34, 70); hx.fillStyle = '#3c3f45'; hx.fillRect(-10, -150, 26, 40);
+    hx.fillStyle = '#1b1c1f'; hx.fillRect(-8, -60, 30, 60); hx.fillStyle = '#555'; hx.fillRect(-6, -150, 4, 30);
+    if (FX.muzzle > 0) { hx.fillStyle = 'rgba(255,220,120,.95)'; hx.beginPath(); hx.arc(3, -160, 22, 0, 7); hx.fill(); hx.fillStyle = '#fff'; hx.beginPath(); hx.arc(3, -160, 10, 0, 7); hx.fill(); }
+    hx.restore(); FX.muzzle -= dt;
+  }
+  for (const id in FX.says) {
+    const q = FX.says[id]; q.t -= dt;
+    if (q.t <= 0) { delete FX.says[id]; continue; }
+    const v = V.players.get(+id); if (!v || v.dead) continue;
+    if (Math.hypot(v.cx - ME.x, v.cy - ME.y) > 700) continue;
+    const s = proj(v.cx, 2.55, v.cy); if (!s) continue;
+    hx.font = '800 14px "M PLUS Rounded 1c",sans-serif'; hx.textAlign = 'center';
+    const w = Math.min(hx.measureText(q.text).width + 16, VW * 0.8);
+    hx.globalAlpha = clamp(q.t, 0, 1);
+    hx.fillStyle = 'rgba(255,255,255,.92)'; hx.fillRect(s.x - w / 2, s.y - 22, w, 26);
+    hx.fillStyle = '#111'; hx.fillText(q.text, s.x, s.y - 4, w - 10);
+    hx.globalAlpha = 1;
+  }
+  for (const v of V.players.values()) { // 話している仲間の頭上に🔊
+    if (v.id === myId || v.dead || !speaking(v.id)) continue;
+    const sp = proj(v.cx, 2.6 + (v.z || 0), v.cy); if (!sp) continue;
+    hx.font = '22px sans-serif'; hx.textAlign = 'center'; hx.fillText('🔊', sp.x, sp.y);
+  }
+  let chg = false;
+  for (const c of FX.chat) { c.t -= dt; if (c.t <= 0) chg = true; }
+  if (chg) { FX.chat = FX.chat.filter(c => c.t > 0); renderChat(); }
+  if (GS.death) {
+    const pu = 0.18 + 0.1 * Math.sin(t * 6.6), g = hx.createRadialGradient(VW / 2, VH / 2, Math.min(VW, VH) * 0.3, VW / 2, VH / 2, Math.max(VW, VH) * 0.75);
+    g.addColorStop(0, 'rgba(120,0,0,0)'); g.addColorStop(1, `rgba(150,0,0,${pu + 0.25})`); hx.fillStyle = g; hx.fillRect(0, 0, VW, VH);
+  }
+  FX.hurt = Math.max(0, FX.hurt - dt * 1.5); FX.flash = Math.max(0, FX.flash - dt * 1.2);
+  if (FX.hurt > 0) { hx.fillStyle = `rgba(200,0,0,${FX.hurt * 0.35})`; hx.fillRect(0, 0, VW, VH); }
+  if (!ME.dead && ME.hp < maxHp() * 0.3) { hx.fillStyle = `rgba(160,0,0,${0.12 + 0.08 * Math.sin(t * 5)})`; hx.fillRect(0, 0, VW, VH); }
+  if (FX.flash > 0) { hx.fillStyle = `rgba(255,255,255,${FX.flash})`; hx.fillRect(0, 0, VW, VH); }
+  // 照準とターゲット
+  const tid = ME.dead ? null : (myHold() != null ? myHold() : findGrabV());
+  if (!ME.dead) {
+    hx.fillStyle = tid != null ? '#78c8ff' : 'rgba(255,255,255,.7)';
+    hx.beginPath(); hx.arc(VW / 2, VH / 2, tid != null ? 5 : 2.5, 0, 7); hx.fill();
+  }
+  if (tid != null) {
+    let label = '';
+    if (tid >= MON_ID) label = '？？？';
+    else if (tid < 0) { const ci = -tid - 1; let n = 0, v = 0; for (const it of V.items.values()) if (it.st === 2 && it.cart === ci) { n++; v += it.val; } label = `カートの持ち手　${n}個　${yen(v)}`; }
+    else { const it = V.items.get(tid); if (it && it.d === HEAD) label = `${nameOf(it.owner)}の頭（納品すると復活）`; else if (it) label = `${ITEMS[it.d].n}　${yen(it.val)}${it.val < it.base ? '（元 ' + yen(it.base) + '）' : ''}${it.st === 1 && it.holder !== myId ? '　👥一緒に持つ' : it.st === 1 && it.nh > 1 ? '　👥' + it.nh + '人で持っている' : ''}`; }
+    if (label) {
+      hx.font = '800 15px "M PLUS Rounded 1c",sans-serif'; hx.textAlign = 'center';
+      const w = hx.measureText(label).width + 18;
+      hx.fillStyle = 'rgba(0,0,0,.65)'; hx.fillRect(VW / 2 - w / 2, VH / 2 + 22, w, 26);
+      hx.fillStyle = tid >= MON_ID ? '#ff9a8f' : tid < 0 ? '#9fd3ff' : '#ffd84d'; hx.fillText(label, VW / 2, VH / 2 + 41);
+    }
+  }
+  const sx = 14, sy = 14, bw = Math.min(190, VW * 0.42);
+  bar(sx, sy, bw, 16, ME.hp / maxHp(), '#e5332a', 'HP ' + Math.ceil(ME.hp));
+  bar(sx, sy + 22, bw, 9, ME.sta / maxSta(), ME.exh ? '#555' : '#4fc3f7');
+  hx.textAlign = 'left'; hx.font = '800 13px "M PLUS Rounded 1c",sans-serif';
+  hx.fillStyle = '#fff'; hx.fillText(`現場 Lv.${GS.lv}　所持金 ${yen(GS.money)}`, sx, sy + 50);
+  hx.fillStyle = '#bbb'; hx.font = '800 12px "M PLUS Rounded 1c",sans-serif';
+  hx.fillText(`🩹×${GS.heal}${isTouch ? '' : ' [Q]'}　💥×${GS.flash}${isTouch ? '' : ' [F]'}${RUN.gun ? '　🔫' + (isClient() ? ((V.players.get(myId) || {}).ammo || 0) : (ME.ammo || 0)) + '/5' + (isTouch ? '' : ' [右クリック]') : ''}　💪STR Lv${strLv()}　🧲つかむ距離Lv${reachLv()}`, sx, sy + 68);
+  // ミニマップ
+  const ptx = Math.floor(ME.x / T), pty = Math.floor(ME.y / T), s = MM.s;
+  for (let y = pty - 4; y <= pty + 4; y++) for (let x = ptx - 4; x <= ptx + 4; x++) {
+    if (x < 0 || y < 0 || x >= MAP.W || y >= MAP.H || MM.seen[y * MAP.W + x]) continue;
+    MM.seen[y * MAP.W + x] = 1;
+    MM.x.fillStyle = MAP.g[y * MAP.W + x] === 2 ? '#000' : MAP.g[y * MAP.W + x] === 3 ? '#4a4038' : MAP.g[y * MAP.W + x] ? '#2a2630' : (MAP.roomOf[y * MAP.W + x] >= 0 ? '#5d5a66' : '#46444d');
+    MM.x.fillRect(x * s, y * s, s, s);
+  }
+  const ds = Math.min(150, VW * 0.3) / MAP.W, mx = sx, my = sy + 80, mw = MAP.W * ds, mh = MAP.H * ds;
+  hx.fillStyle = 'rgba(0,0,0,.6)'; hx.fillRect(mx - 3, my - 3, mw + 6, mh + 6);
+  hx.imageSmoothingEnabled = false; hx.drawImage(MM.cv, mx, my, mw, mh); hx.imageSmoothingEnabled = true;
+  const r0 = MAP.truck.room;
+  hx.strokeStyle = '#7ad48a'; hx.lineWidth = 1.5; hx.strokeRect(mx + r0.x * ds, my + r0.y * ds, r0.w * ds, r0.h * ds);
+  for (const d of MAP.desks) { hx.fillStyle = '#ffd84d'; hx.fillRect(mx + d.zone.x / T * ds, my + d.zone.y / T * ds, 3 * ds, 2 * ds); }
+  for (const c of V.carts) { hx.fillStyle = '#78c8ff'; hx.fillRect(mx + c.cx / T * ds - 2, my + c.cy / T * ds - 2, 4, 4); }
+  for (const v of V.players.values()) {
+    if (v.dead) continue;
+    const e = eyeOf(v), px = mx + e.x / T * ds, py = my + e.y / T * ds;
+    hx.fillStyle = v.id === myId ? '#fff' : colOf(v.id); hx.beginPath(); hx.arc(px, py, v.id === myId ? 3 : 2.4, 0, 7); hx.fill();
+    if (v.id === myId) { hx.strokeStyle = '#fff'; hx.beginPath(); hx.moveTo(px, py); hx.lineTo(px + Math.cos(ME.yaw) * 8, py + Math.sin(ME.yaw) * 8); hx.stroke(); }
+  }
+  if (V.players.size > 1) {
+    let yy = my + mh + 18;
+    hx.font = '800 12px "M PLUS Rounded 1c",sans-serif'; hx.textAlign = 'left';
+    for (const v of V.players.values()) {
+      if (v.id === myId) continue;
+      hx.fillStyle = colOf(v.id); hx.fillText((speaking(v.id) ? '🔊' : '') + nameOf(v.id) + (v.dead ? ' 💀' : ''), sx, yy);
+      if (!v.dead) bar(sx + 90, yy - 9, 70, 8, v.hp / maxHp(), '#e5332a');
+      yy += 17;
+    }
+  }
+  const qw = Math.min(220, VW * 0.42), qx = VW - qw - 14, qy = 14, met = GS.sold >= GS.quota;
+  hx.fillStyle = 'rgba(0,0,0,.65)'; hx.fillRect(qx, qy, qw, 58);
+  hx.strokeStyle = GS.death ? '#e5332a' : '#ffd84d'; hx.lineWidth = 2; hx.strokeRect(qx, qy, qw, 58);
+  hx.textAlign = 'right'; hx.fillStyle = '#aaa'; hx.font = '800 11px "M PLUS Rounded 1c",sans-serif'; hx.fillText('ノルマ', qx + qw - 8, qy + 15);
+  hx.fillStyle = met ? '#7dffa0' : '#ffd84d'; hx.font = '800 17px "M PLUS Rounded 1c",sans-serif'; hx.fillText(`${yen(GS.sold)} / ${yen(GS.quota)}`, qx + qw - 8, qy + 35);
+  hx.fillStyle = '#333'; hx.fillRect(qx + 8, qy + 43, qw - 16, 7);
+  hx.fillStyle = met ? '#7dffa0' : '#ffd84d'; hx.fillRect(qx + 8, qy + 43, (qw - 16) * clamp(GS.sold / GS.quota, 0, 1), 7);
+  if (GS.death && Math.sin(t * 8) > -0.3) { hx.fillStyle = '#ff5a4d'; hx.font = '800 14px "M PLUS Rounded 1c",sans-serif'; hx.fillText('全員バスへ戻れ！', qx + qw, qy + 78); }
+  let hint = '';
+  if (ME.dead) hint = '死亡した…仲間の視点で観戦中';
+  else {
+    for (const d of MAP.desks) if (Math.hypot(ME.x - d.btn.x, ME.y - d.btn.y) < 64) hint = '【アクション】納品（エリアからはみ出た物は壊れる）';
+    if (!hint && inBus(ME)) hint = met ? '【アクション】または「出発」ボタンでバスを出発！' : 'バス：ノルマを達成したら出発できる';
+    const h = myHold();
+    if (!hint && h == null) for (const [i, c] of V.carts.entries()) { if (Math.hypot(ME.x - c.cx, ME.y - c.cy) < 75 && [...V.items.values()].some(it => it.st === 2 && it.cart === i)) { hint = '【アクション】カートからお宝を取り出す'; break; } }
+    if (!hint && ME.crouch) hint = 'しゃがみ中：モンスターに見つかりにくい';
+    if (!hint && h == null && tid != null && tid < 0) hint = 'カートは誰かが持って押すと中身が落ちにくい';
+    if (!hint && h != null && h < 0) hint = '持ち手を持って押している（向きを変えると曲がる）';
+    if (!hint && h != null && h >= MON_ID) hint = '敵をつかんでいる！ 壁や床に叩きつけるとダメージ';
+    if (!hint && h != null && h >= 0 && h < MON_ID) { const it = V.items.get(h); if (it) hint = ITEMS[it.d].big ? '大きい物はカートからはみ出しやすい…慎重に運べ' : 'カートの真ん中に載せると落ちにくい・視点を上げて離すと投げ上がる'; }
+    if (!hint && !locked && !isTouch && !PAD.on && T0 % 10 < 3) hint = 'クリックするとマウスが画面に固定されて回しやすくなる';
+  }
+  if (hint) {
+    if (!isTouch) hint = hint.replace('【アクション】', '[E] ');
+    hx.font = '800 15px "M PLUS Rounded 1c",sans-serif'; hx.textAlign = 'center';
+    const w = hx.measureText(hint).width + 24, hy = VH - (isTouch ? 190 : 50);
+    hx.fillStyle = 'rgba(0,0,0,.7)'; hx.fillRect(VW / 2 - w / 2, hy - 20, w, 30);
+    hx.fillStyle = '#fff'; hx.fillText(hint, VW / 2, hy);
+  }
+  if (FX.msg) {
+    FX.msg.t -= dt;
+    if (FX.msg.t <= 0) FX.msg = null;
+    else {
+      hx.globalAlpha = clamp(FX.msg.t * 2, 0, 1); hx.textAlign = 'center';
+      hx.font = `800 ${Math.min(24, VW / 18)}px "M PLUS Rounded 1c",sans-serif`;
+      hx.lineWidth = 5; hx.strokeStyle = '#000'; hx.strokeText(FX.msg.text, VW / 2, VH * 0.22);
+      hx.fillStyle = FX.msg.col; hx.fillText(FX.msg.text, VW / 2, VH * 0.22); hx.globalAlpha = 1;
+    }
+  }
+}
+
+// ================= ループ =================
+let last = performance.now(), T0 = 0;
+function loop(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now; T0 += dt;
+  if (innerWidth !== VW || innerHeight !== VH) resize();
+  pollPad(dt);
+  voiceTick(dt);
+  $('bDepart').classList.toggle('on', !!(playing && MAP && ME && !ME.dead && !anyScr() && GS.sold >= GS.quota && inBus(ME)));
+  if (playing && MAP && V && ME && world) {
+    const paused = G && G.paused;
+    if (!paused) {
+      controlMe(dt);
+      if (G) { if (!G.ended) hostUpdate(dt); applySnap(makeSnap(), true); }
+      smoothView(dt);
+      for (const r of MAP.rooms) { r.flT -= dt; if (r.flT <= 0) { r.fl = r.fl < 1 ? 1 : rnd(0.15, 0.6); r.flT = r.fl < 1 ? rnd(0.05, 0.2) : rnd(2, 8); } }
+      if (GS.death) { FX.beatT -= dt; if (FX.beatT <= 0) { FX.beatT = 0.95; sfx('beat'); } }
+    }
+    netTick(dt);
+    let e = ME;
+    if (ME.dead) { const al = [...V.players.values()].filter(v => !v.dead && v.id !== myId); if (al.length) e = eyeOf(al[0]); }
+    FX.shake = Math.max(0, FX.shake - dt * 30);
+    const bob = ME.dead ? 0 : Math.sin(ME.step * 2) * 0.035 * clamp(Math.hypot(ME.vx, ME.vy) / 150, 0, 1);
+    camera.position.set(e.x * SC + (Math.random() - 0.5) * FX.shake * 0.006, EYE + bob + eyeH(e) - (ME.dead && e === ME ? 1.2 : 0), e.y * SC + (Math.random() - 0.5) * FX.shake * 0.006);
+    camera.rotation.y = -e.yaw - Math.PI / 2; camera.rotation.x = e.pitch;
+    syncScene(dt, T0);
+    renderer.render(scene, camera);
+    drawHUD(dt, T0);
+  } else {
+    renderer.render(scene, camera);
+    hx.setTransform(1, 0, 0, 1, 0, 0); hx.clearRect(0, 0, hud.width, hud.height);
+  }
+  requestAnimationFrame(loop);
+}
+toTitle();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
